@@ -29,16 +29,17 @@ cross-env NODE_ENV=development nodemon --exec ts-node src/app.ts
 - ✅ config type
 - ✅ 自动加载路由
 - ✅ 自动加载model
-- constant
+- ✅ constant
 - ✅ 扩展ctx方法
 - 自动加载BLL
-- 业务错误码
+- ✅ 业务错误码
 - 登录注册
 - 统一鉴权
-- schedule(task/job)
+- ✅ schedule(task/job)
 - email
 - jest测试
-- log4js日志
+- ✅ log4js日志
+- app.boot()增加周期
 
 ## problem
 > package.json type设为commonjs,tsconfig.json里module设为commonjs.这样就能运行

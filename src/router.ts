@@ -10,7 +10,9 @@ loader({
   recusive: true,
 }, function (info) {
   const route = require(info.fullpath).default
-  router.use(route.routes())
+  if (route) {
+    router.use(route.routes())
+  }
 });
 
 export default router

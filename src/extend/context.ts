@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import BizError from '../utils/bizError';
 
 export function paging() {
   let { page, pn: limit } = this.request.query;
@@ -20,4 +21,9 @@ export function success(data: any, params: any = {}) {
   }
   this.status = status
   this.body = body;
+}
+
+export function throwBiz(name: string, params?: object) {
+  const bizError = new BizError(name, params);
+  throw bizError;
 }
