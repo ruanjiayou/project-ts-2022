@@ -1,21 +1,14 @@
 import { Schema, model } from 'mongoose'
 import moment from 'moment-timezone'
 import config from '../../config/index'
-import { IConfig } from '../../types/model';
-import { baseMethod, baseStatic } from '../base'
+import { IJob } from '../../types/model';
+import { baseStatic, baseMethod } from '../base'
 
 const schema: Schema = new Schema({
   _id: {
     type: String,
   },
-  project_id: {
-    type: String,
-    default: ''
-  },
   name: {
-    type: String,
-  },
-  desc: {
     type: String,
   },
   type: {
@@ -33,18 +26,14 @@ const schema: Schema = new Schema({
     type: Date,
     default: () => moment().tz(config.timezone).toDate(),
   },
-  order: {
-    type: Number,
-    default: 1
-  }
 }, {
   strict: true,
-  collection: 'config_info',
+  collection: 'job_info',
 });
 
 schema.static(baseStatic);
 schema.method(baseMethod);
 
-const Model = model<IConfig>('Config', schema, 'config_info');
+const Model = model<IJob>('Job', schema, 'job_info');
 
 module.exports = Model

@@ -9,9 +9,9 @@ loader({
   dir: path.join(__dirname, 'schema'),
   recusive: true,
 }, function (info) {
-  const name = _.upperFirst(_.camelCase(info.filename));
   const model = require(info.fullpath);
   if (model) {
+    const name = model.modelName;
     models[name] = model;
   }
 });

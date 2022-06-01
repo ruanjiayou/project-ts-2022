@@ -29,6 +29,7 @@ cross-env NODE_ENV=development nodemon --exec ts-node src/app.ts
 - ✅ config type
 - ✅ 自动加载路由
 - ✅ 自动加载model
+- ✅ 定义接口并实现model的静态方法和实例方法
 - ✅ constant
 - ✅ 扩展ctx方法
 - 自动加载BLL
