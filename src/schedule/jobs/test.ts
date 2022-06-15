@@ -1,6 +1,6 @@
 import moment from 'moment-timezone'
-import config from '../../config/index'
-import { Task } from '../../types/schedule'
+import config from '@root/config/index'
+import { Task } from '@root/types/schedule'
 
 const task: Task = {
   name: 'test',

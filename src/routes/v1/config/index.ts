@@ -1,8 +1,7 @@
 import { Context } from 'koa'
 import _ from 'lodash'
 import uuid from 'uuid'
-import { IConfig, IConfigModel } from '../../../types/model';
-import Logger from '../../../utils/logger'
+import { IConfig, IConfigModel } from '@root/types/model';
 
 const Router = require('koa-router')
 

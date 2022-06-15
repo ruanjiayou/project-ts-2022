@@ -1,13 +1,14 @@
 import path from 'path';
 import mongoose from 'mongoose';
 import _ from 'lodash'
-import loader from '../utils/loader'
+import loader, { Info } from '../utils/loader'
 
 const models: any = {}
 
 loader({
   dir: path.join(__dirname, 'schema'),
   recusive: true,
+  filter: (info: Info) => info.fullpath.endsWith('.js'),
 }, function (info) {
   const model = require(info.fullpath);
   if (model) {

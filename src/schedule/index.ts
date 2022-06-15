@@ -1,9 +1,9 @@
 import nodeSchedule from 'node-schedule'
 import _ from 'lodash'
 import path from 'path'
-import config from '../config/index'
-import { Schedule } from '../types/schedule'
-import loader from '../utils/loader'
+import config from '@root/config/index'
+import { Schedule } from '@root/types/schedule'
+import loader, { Info } from '@root/utils/loader'
 
 const schedule: Schedule = {
   tasks: {},
@@ -42,6 +42,7 @@ const schedule: Schedule = {
 
 loader({
   dir: path.join(__dirname, 'jobs'),
+  filter: (info: Info) => info.fullpath.endsWith('.js'),
 }, function (info) {
   const task = require(info.fullpath).default;
   schedule.load(task);

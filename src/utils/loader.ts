@@ -3,11 +3,11 @@ import path from 'path'
 
 type Opt = {
   dir: string;
-  filter?: object;
+  filter?: Function;
   recusive?: boolean;
 }
 
-type Info = {
+export type Info = {
   fullpath: string;
   dir: string;
   filename: string;
@@ -18,7 +18,7 @@ type CallBack = {
   (info: Info): void;
 }
 
-function scanner(dir: string, cb: CallBack, filter?: object, recusive?: boolean) {
+function scanner(dir: string, cb: CallBack, filter?: Function, recusive?: boolean) {
   fs.readdirSync(dir).forEach(file => {
     const fullpath = path.join(dir, file);
     const ext = path.extname(file).toLocaleLowerCase();
@@ -27,7 +27,14 @@ function scanner(dir: string, cb: CallBack, filter?: object, recusive?: boolean)
       scanner(fullpath, cb, filter, recusive);
     } else if (cb) {
       // filter处理
-      cb({ fullpath, dir, filename, ext });
+      const info = { fullpath, dir, filename, ext };
+      if (typeof filter === 'function') {
+        if (filter(info)) {
+          cb(info);
+        }
+      } else {
+        cb(info);
+      }
     }
   });
 }

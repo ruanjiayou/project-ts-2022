@@ -6,7 +6,7 @@ log4js.configure({
   appenders: {
     access: {
       type: 'dateFile',
-      filename: path.join(constant.PATH.ROOT, 'log/access.log'),
+      filename: path.join(constant.PATH.ROOT, 'logs/access.log'),
       keepFileExt: true,
       fileNameSep: '_',
       pattern: 'yyyy-MM-dd',

@@ -1,6 +1,6 @@
 import path from 'path'
 import Router from 'koa-router'
-import loader from './utils/loader'
+import loader, { Info } from '@root/utils/loader'
 
 
 const router = new Router();
@@ -8,6 +8,7 @@ const router = new Router();
 loader({
   dir: path.join(__dirname, 'routes'),
   recusive: true,
+  filter: (info: Info) => info.fullpath.endsWith('.js'),
 }, function (info) {
   const route = require(info.fullpath).default
   if (route) {

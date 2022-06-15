@@ -1,7 +1,7 @@
 import { Context } from 'koa'
 import Router from 'koa-router'
-import { IJob, IJobModel } from '../../../types/model';
-import Logger from '../../../utils/logger'
+import { IJob, IJobModel } from '@root/types/model';
+import Logger from '@root/utils/logger'
 
 const logger = Logger('task');
 const router = new Router({
