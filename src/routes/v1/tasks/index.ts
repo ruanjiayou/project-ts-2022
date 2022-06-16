@@ -1,6 +1,6 @@
 import { Context } from 'koa'
 import Router from 'koa-router'
-import { IJob, IJobModel } from '@root/types/model';
+import { IJob, MJob } from '@root/types/model';
 import Logger from '@root/utils/logger'
 
 const logger = Logger('task');
@@ -21,7 +21,7 @@ router.patch('/:name', async (ctx: Context) => {
 })
 
 router.get('/:name/logs', async (ctx: Context) => {
-  const Job: IJobModel = ctx.models.Job;
+  const Job: MJob = ctx.models.Job;
   const where = { name: ctx.params.name }
   const items: IJob[] = await Job.getList({ where });
   ctx.success({ items })

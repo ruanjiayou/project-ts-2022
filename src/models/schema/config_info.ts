@@ -1,22 +1,16 @@
 import { Schema, model } from 'mongoose'
-import moment from 'moment-timezone'
-import config from '../../config/index'
 import { IConfig } from '../../types/model';
-import { baseMethod, baseStatic } from '../base'
+import { baseMethod, baseStatic, baseInfo } from '../base'
 
 const schema: Schema = new Schema({
-  _id: {
-    type: String,
-  },
+  ...baseInfo,
   project_id: {
     type: String,
     default: ''
   },
-  name: {
-    type: String,
-  },
-  desc: {
-    type: String,
+  status: {
+    type: Number,
+    default: 1,
   },
   type: {
     type: String,
@@ -24,14 +18,6 @@ const schema: Schema = new Schema({
   value: {
     type: Object,
     default: {},
-  },
-  createdAt: {
-    type: Date,
-    default: () => moment().tz(config.timezone).toDate(),
-  },
-  updatedAt: {
-    type: Date,
-    default: () => moment().tz(config.timezone).toDate(),
   },
   order: {
     type: Number,

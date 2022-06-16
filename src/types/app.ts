@@ -15,7 +15,12 @@ type Config = {
     db: string;
     query: object | undefined;
   },
-  USER_TOKEN_SECRET: string;
+  USER_TOKEN: {
+    ACCESS_TOKEN_SECRET: string;
+    ACCESS_TOKEN_EXPIRES: number;
+    REFRESH_TOKEN_SECRET: string;
+    REFRESH_TOKEN_EXPIRES: number;
+  },
 }
 
 type Pagination = {

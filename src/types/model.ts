@@ -32,45 +32,51 @@ export interface BaseModel<T> {
   getInfo(hql?: Hql): Promise<T>;
 }
 
-export interface IConfig extends Document {
-  _id?: string;
-  project_id?: string;
-  name?: string;
-  desc?: string;
-  type?: string;
-  value?: object;
-  createdAt?: Date;
-  updatedAt?: Date;
-  order?: number;
-}
-
-export interface IConfigModel extends BaseModel<IConfig>, Model<IConfig> {
-
-}
-
-export interface IComponent extends Document {
-  _id: string;
+interface BaseDocument<T = any, TQueryHelpers = any, DocType = any> {
   title: string;
   name: string;
   cover: string;
   desc: string;
-  accepts: string[];
-  status: number;
-}
-
-export interface IComponentModel extends BaseModel<IConfig>, Model<IConfig> {
-
-}
-
-export interface IJob extends Document {
-  _id: string;
-  name: string;
-  type: string;
-  value: object;
+  available: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface IJobModel extends BaseModel<IJob>, Model<IJob> {
+export interface IConfig extends BaseDocument, Document {
 
+  project_id?: string;
+  type?: string;
+  value?: object;
+  order?: number;
+}
+
+export interface MConfig extends BaseModel<IConfig>, Model<IConfig> {
+
+}
+
+export interface IComponent extends BaseDocument, Document {
+  accepts: string[];
+  status: number;
+}
+
+export interface MComponent extends BaseModel<IConfig>, Model<IConfig> {
+
+}
+
+export interface IJob extends BaseDocument, Document {
+  type: string;
+  value: object;
+}
+
+export interface MJob extends BaseModel<IJob>, Model<IJob> {
+
+}
+
+export interface IUser extends BaseDocument, Document {
+  pass: string;
+  salt: string;
+}
+
+export interface MUser extends BaseModel<IUser>, Model<IUser> {
+  isEqualPass(pass: string): boolean;
 }

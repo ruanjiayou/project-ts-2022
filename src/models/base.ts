@@ -1,5 +1,7 @@
 import _ from 'lodash'
-import { Hql } from '../types/model'
+import moment from 'moment-timezone'
+import { Hql } from '@root/types/model'
+import config from '@root/config/index'
 
 function init(query: any): Hql {
   const hql: Hql = {
@@ -27,6 +29,37 @@ function init(query: any): Hql {
 
   return hql;
 }
+
+export const baseInfo = {
+  _id: {
+    type: String,
+  },
+  title: {
+    type: String,
+  },
+  name: {
+    type: String,
+  },
+  cover: {
+    type: String,
+  },
+  desc: {
+    type: String,
+  },
+  available: {
+    type: Number,
+    default: 1,
+    comment: '上下线与status是有区别的',
+  },
+  createdAt: {
+    type: Date,
+    default: () => moment().tz(config.timezone).toDate(),
+  },
+  updatedAt: {
+    type: Date,
+    default: () => moment().tz(config.timezone).toDate(),
+  },
+};
 
 // 基本静态方法
 export const baseStatic = {
