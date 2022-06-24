@@ -42,7 +42,7 @@ const schedule: Schedule = {
 
 loader({
   dir: path.join(__dirname, 'jobs'),
-  filter: (info: Info) => info.fullpath.endsWith('.js'),
+  filter: (info: Info) => info.fullpath.endsWith(process.env.NODE_ENV === 'development' ? '.ts' : '.js'),
 }, function (info) {
   const task = require(info.fullpath).default;
   schedule.load(task);

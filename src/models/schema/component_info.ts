@@ -8,12 +8,12 @@ const schema: Schema = new Schema({
     type: String,
     default: ''
   },
-  // btn,icon,searchBtn,layout,align-side,align-center,align-around,full-width,full-width-fix,full-width-auto,full-height,full-height-fix,full-height-auto,
+  // layout,align-side,align-center,align-around,full-width,full-width-fix,full-width-auto,full-height,full-height-fix,full-height-auto,
   // filter,filter-row,filter-tag,tab,tab-item,tabbar,tabbar-item
   // safearea,hotarea,menuitems,slide-card,carousel-card,tips-card,
-  // link-item(type,icon,name,)
+  // btn,icon,searchBtn,link-item(type,icon,name,)
   type: {
-    type: String,
+    type: String, // layout, ui, container, 
   },
   status: {
     type: Number,
@@ -30,7 +30,7 @@ const schema: Schema = new Schema({
   }
 }, {
   strict: true,
-  collection: 'config_info',
+  collection: 'component_info',
 });
 
 schema.static(baseStatic);

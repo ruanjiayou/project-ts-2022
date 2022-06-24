@@ -16,6 +16,6 @@ export default {
     ACCESS_TOKEN_SECRET: 'lp#yBMS0f!4IleTVnpA@',
     REFRESH_TOKEN_SECRET: '%Ph36Tv9VnpM27!A@',
     ACCESS_TOKEN_EXPIRES: 60 * 60 * 24 * 7,
-    REFRESH_TOKEN_EXPIRES: 60 * 60 * 24 * 7,
+    REFRESH_TOKEN_EXPIRES: 60 * 60 * 24 * 30,
   },
 }

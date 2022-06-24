@@ -46,6 +46,7 @@ export default async (ctx: Context, next: Next): Promise<void> => {
   try {
     await next();
   } catch (e) {
+    console.log(e, 'handle');
     const result = generateByBizError(e instanceof BizError ? e : new BizError('unknown'));
     ctx.status = result.status
     ctx.body = result.data

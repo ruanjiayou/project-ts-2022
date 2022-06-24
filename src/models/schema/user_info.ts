@@ -1,9 +1,33 @@
 import { Schema, model } from 'mongoose'
-import { IUser } from '../../types/model';
+import crypto from 'crypto'
+import moment from 'moment-timezone'
+import config from '@root/config';
+import { IUser } from '@root/types/model';
 import { baseStatic, baseMethod, baseInfo } from '../base'
 
 const schema: Schema = new Schema({
-  ...baseInfo,
+  _id: {
+    type: String,
+  },
+  available: {
+    type: Number,
+    default: 1,
+    comment: '上下线与status是有区别的',
+  },
+  createdAt: {
+    type: Date,
+    default: () => moment().tz(config.timezone).toDate(),
+  },
+  updatedAt: {
+    type: Date,
+    default: () => moment().tz(config.timezone).toDate(),
+  },
+  account: {
+    type: String,
+  },
+  nickname: {
+    type: String,
+  },
   avatar: {
     type: String,
     default: '',
@@ -25,7 +49,7 @@ schema.static(baseStatic);
 schema.method({
   ...baseMethod,
   isEqualPass: function (pass: string) {
-    return this.pass === pass;
+    return crypto.createHmac('sha1', this._doc.salt).update(pass).digest('hex') === this._doc.pass;
   }
 });
 

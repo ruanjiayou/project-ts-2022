@@ -32,10 +32,10 @@ cross-env NODE_ENV=development nodemon --exec ts-node src/app.ts
 - ✅ 定义接口并实现model的静态方法和实例方法
 - ✅ constant
 - ✅ 扩展ctx方法
-- 自动加载BLL
+- ✅ 自动加载BLL
 - ✅ 业务错误码
-- 登录注册
-- 统一鉴权
+- ✅ 登录注册
+- ✅ 统一鉴权
 - ✅ schedule(task/job)
 - email
 - jest测试

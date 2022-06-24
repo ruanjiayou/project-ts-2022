@@ -72,11 +72,20 @@ export interface MJob extends BaseModel<IJob>, Model<IJob> {
 
 }
 
-export interface IUser extends BaseDocument, Document {
+export interface IUser extends Document {
+  _id: string;
   pass: string;
   salt: string;
+  account: string;
+  avatar: string;
+  nickname: string;
+  available: string;
+  createdAt: Date;
+  updatedAt: Date;
+  refreshToken: string;
+  isEqualPass(pass: string): boolean;
 }
 
 export interface MUser extends BaseModel<IUser>, Model<IUser> {
-  isEqualPass(pass: string): boolean;
+  
 }

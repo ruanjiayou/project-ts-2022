@@ -1,5 +1,8 @@
 import { Context, Next } from "koa";
 import jwt from 'jsonwebtoken'
+import Logger from '@root/utils/logger'
+
+const logger = Logger('verify')
 
 export default async function (ctx: Context, next: Next) {
   const access_token = ctx.request.get('X-Token');
@@ -7,8 +10,11 @@ export default async function (ctx: Context, next: Next) {
     const payload = await jwt.verify(access_token, ctx.config.USER_TOKEN.ACCESS_TOKEN_SECRET);
     ctx.state.user = payload;
   } catch (e) {
-    // TODO: expired notfound
-    ctx.throwBiz('');
+    logger.error(e);
+    if (e.message === 'jwt expired') {
+      return ctx.throwBiz('tokenExpired');
+    }
+    ctx.throwBiz('tokenNotFound');
   }
   await next()
 };

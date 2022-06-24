@@ -8,7 +8,7 @@ const router = new Router();
 loader({
   dir: path.join(__dirname, 'routes'),
   recusive: true,
-  filter: (info: Info) => info.fullpath.endsWith('.js'),
+  filter: (info: Info) => info.fullpath.endsWith(process.env.NODE_ENV === 'development' ? '.ts' : '.js'),
 }, function (info) {
   const route = require(info.fullpath).default
   if (route) {
