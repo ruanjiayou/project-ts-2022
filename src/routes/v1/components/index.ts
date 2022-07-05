@@ -1,6 +1,6 @@
 import { Context } from 'koa'
 import _ from 'lodash'
-import uuid from 'uuid'
+import { v4 } from 'uuid'
 import { IComponent, MComponent } from '@root/types/model';
 
 const Router = require('koa-router')
@@ -22,15 +22,15 @@ router.get('/:id', async (ctx: Context) => {
 })
 
 router.post('/', async (ctx: Context) => {
-  const Component: MComponent = ctx.models.Config
-  const data: any = _.pick(ctx.request.body, ['name', 'desc', 'type', 'value', 'order']);
-  data._id = uuid.v4();
-  const item = await Component.create({});
+  const Component: MComponent = ctx.models.Component
+  const data: any = _.pick(ctx.request.body, ['title', 'name', 'desc', 'type']);
+  data._id = v4();
+  const item = await Component.create(data);
   ctx.success({ item })
 })
 
 router.put('/:id', async (ctx: Context) => {
-  const Component: MComponent = ctx.models.Config
+  const Component: MComponent = ctx.models.Component
   const where = { _id: ctx.params.id };
   const item: IComponent = await Component.getInfo({ where })
   if (item) {
