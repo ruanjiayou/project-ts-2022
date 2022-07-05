@@ -1,41 +1,41 @@
 import { Context } from 'koa'
 import _ from 'lodash'
 import uuid from 'uuid'
-import { IConfig, MConfig } from '@root/types/model';
+import { IPage, MPage } from '@root/types/model';
 
 const Router = require('koa-router')
 
 const router = new Router({
-  prefix: ''
+  prefix: '/api/v1/pages'
 })
 
 router.get('/', async (ctx: Context) => {
-  const Config: MConfig = ctx.models.Config
-  const items: IConfig[] = await Config.getAll();
+  const Page: MPage = ctx.models.Page
+  const items: IPage[] = await Page.getAll();
   ctx.success({ items })
 })
 
 router.get('/:id', async (ctx: Context) => {
-  const Config: MConfig = ctx.models.Config
-  const item: IConfig = await Config.getInfo({ where: { _id: ctx.params.id } });
+  const Page: MPage = ctx.models.Page
+  const item: IPage = await Page.getInfo({ where: { _id: ctx.params.id } });
   ctx.success({ item })
 })
 
 router.post('/', async (ctx: Context) => {
-  const Config: MConfig = ctx.models.Config
+  const Page: MPage = ctx.models.Config
   const data: any = _.pick(ctx.request.body, ['name', 'desc', 'type', 'value', 'order']);
   data._id = uuid.v4();
-  const item: IConfig = await Config.create({});
+  const item = await Page.create({});
   ctx.success({ item })
 })
 
 router.put('/:id', async (ctx: Context) => {
-  const Config: MConfig = ctx.models.Config
+  const Page: MPage = ctx.models.Config
   const where = { _id: ctx.params.id };
-  const item = await Config.getInfo({ where })
+  const item: IPage = await Page.getInfo({ where })
   if (item) {
     const data = _.pick(ctx.request.body, ['name', 'desc', 'type', 'value', 'order']);
-    await Config.updateOne(where, { $set: data });
+    await Page.updateOne(where, { $set: data });
     ctx.success()
   } else {
     ctx.throwBiz('COMMON.ResourceNotFound')

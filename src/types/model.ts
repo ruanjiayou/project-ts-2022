@@ -59,8 +59,9 @@ export interface IComponent extends BaseDocument, Document {
   status: number;
 }
 
-export interface MComponent extends BaseModel<IConfig>, Model<IConfig> {
-
+export interface MComponent extends BaseModel<IComponent>, Model<IComponent> {
+  accepts: string[];
+  status: number;
 }
 
 export interface IJob extends BaseDocument, Document {
@@ -87,5 +88,30 @@ export interface IUser extends Document {
 }
 
 export interface MUser extends BaseModel<IUser>, Model<IUser> {
+  
+}
+
+export interface IPage extends BaseDocument, Document {
+  _id: string;
+  project_id: string;
+  template: string;
+  status: number;
+  tree_id: string;
+}
+
+export interface MPage extends BaseModel<IPage>, Model<IPage> {
+  
+}
+
+export interface IModule extends BaseDocument, Document {
+  _id: string;
+  status: number;
+  tree_id: string;
+  parent_id: string;
+  component_id: string;
+  component_type: string;
+}
+
+export interface MModule extends BaseModel<IModule>, Model<IModule> {
   
 }
