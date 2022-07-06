@@ -75,6 +75,10 @@ export const baseStatic = {
     const opt = init(opts);
     return this.findOne(opt.where).lean(opt.lean);
   },
+  async destroy(opts = {}) {
+    const opt = init(opts);
+    return this.deleteMany(opt.where);
+  }
 }
 
 // 基本实例方法

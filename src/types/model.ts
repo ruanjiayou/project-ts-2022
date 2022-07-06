@@ -30,6 +30,11 @@ export interface BaseModel<T> {
    * @param hql 条件对象
    */
   getInfo(hql?: Hql): Promise<T>;
+  /**
+   * 删除
+   * @param hql 条件对象
+   */
+  destroy(hql?: Hql): Promise<T>;
 }
 
 interface BaseDocument<T = any, TQueryHelpers = any, DocType = any> {
@@ -88,7 +93,7 @@ export interface IUser extends Document {
 }
 
 export interface MUser extends BaseModel<IUser>, Model<IUser> {
-  
+
 }
 
 export interface IPage extends BaseDocument, Document {
@@ -100,7 +105,7 @@ export interface IPage extends BaseDocument, Document {
 }
 
 export interface MPage extends BaseModel<IPage>, Model<IPage> {
-  
+
 }
 
 export interface IModule extends BaseDocument, Document {
@@ -113,5 +118,5 @@ export interface IModule extends BaseDocument, Document {
 }
 
 export interface MModule extends BaseModel<IModule>, Model<IModule> {
-  
+
 }

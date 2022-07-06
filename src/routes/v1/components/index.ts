@@ -21,6 +21,12 @@ router.get('/:id', async (ctx: Context) => {
   ctx.success({ item })
 })
 
+router.delete('/:id', async (ctx: Context) => {
+  const Component: MComponent = ctx.models.Component
+  await Component.destroy({ where: { _id: ctx.params.id } });
+  ctx.success({})
+})
+
 router.post('/', async (ctx: Context) => {
   const Component: MComponent = ctx.models.Component
   const data: any = _.pick(ctx.request.body, ['title', 'name', 'desc', 'type']);
