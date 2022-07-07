@@ -120,3 +120,16 @@ export interface IModule extends BaseDocument, Document {
 export interface MModule extends BaseModel<IModule>, Model<IModule> {
 
 }
+
+export interface IGroup extends BaseDocument, Document {
+  _id: string;
+  status: number;
+  tree_id: string;
+  parent_id: string;
+  component_id: string;
+  component_type: string;
+}
+
+export interface MGroup extends BaseModel<IGroup>, Model<IGroup> {
+
+}

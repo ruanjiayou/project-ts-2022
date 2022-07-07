@@ -13,4 +13,9 @@ router.get('/profile', verify, async (ctx: Context) => {
   ctx.success(data)
 });
 
+router.get('/signature', verify, async (ctx: Context) => {
+  const data = await profile(ctx);
+  ctx.success(data)
+});
+
 export default router
