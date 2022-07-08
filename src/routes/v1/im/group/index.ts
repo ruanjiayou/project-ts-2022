@@ -6,7 +6,7 @@ import { IGroup, MGroup } from '@root/types/model';
 const Router = require('koa-router')
 
 const router = new Router({
-  prefix: ''
+  prefix: '/api/v1/im/groups'
 })
 
 router.get('/', async (ctx: Context) => {

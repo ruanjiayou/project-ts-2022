@@ -1,4 +1,5 @@
 import { Schedule } from "./schedule";
+import IM from '../utils/IMsdk'
 
 type Config = {
   PORT: number;
@@ -53,6 +54,7 @@ declare module "koa" {
      */
     throwBiz(name: string, params?: object): void;
     config: Config;
+    im: IM;
     models: {
       [modelName: string]: any;
     },

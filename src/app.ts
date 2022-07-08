@@ -12,6 +12,7 @@ import handler from './middleware/handler'
 import { paging, success, throwBiz } from './extend/context'
 import schedule from './schedule/index'
 import constant from './constant'
+import IMClient from '@root/utils/IMsdk'
 
 const app = new Koa()
 app.context.config = config;
@@ -20,6 +21,7 @@ app.context.schedule = schedule
 app.context.throwBiz = throwBiz
 app.context.paging = paging;
 app.context.success = success;
+app.context.im = new IMClient(0, '', '', 0);
 
 app.use(responseTime);
 app.use(cors);
