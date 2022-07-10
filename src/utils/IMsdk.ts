@@ -44,9 +44,12 @@ export interface IMGroup {
   Introduction: string;
   Notification: string;
   FaceUrl: string;
+  Type: IMGroup_Type;
   MaxMemberNum: number;
+  Owner_Account: string;
   ApplyJoinOption: IMGroup_ApplyJoinOption;
-  AppDefineData: IMGroup_AppdefineData
+  AppDefineData: IMGroup_AppdefineData;
+  ShutUpAllMember: "On" | "Off";
 }
 
 enum IM_MSG_TYPE {
@@ -87,6 +90,7 @@ enum IM_API_ACCOUNT {
 
 enum IM_API_GROUP {
   GET_GROUPS = 'v4/group_open_http_svc/get_appid_group_list',
+  GET_DETAIL = 'v4/group_open_http_svc/get_group_info',
   CREATE_GROUPS = 'v4/group_open_http_svc/create_group',
   MUTE_USER = 'v4/group_open_http_svc/forbid_send_msg',
   MUTED_USERS = 'v4/group_open_http_svc/get_group_shutted_uin',
@@ -157,11 +161,16 @@ class IM {
     return this.fetch<{ TotalCount: number, Next: number, GroupIdList: [{ GroupId: string }] }>(IMAPI_PATH.GROUP.GET_GROUPS, { query });
   }
 
+  async requestGetGroupDetail(id: string, filter: string[]): Promise<IMGroup & IMResponse> {
+    const resp = await this.fetch<{ GroupInfo: [IMGroup & IMResponse] }>(IMAPI_PATH.GROUP.GET_DETAIL, { body: { GroupIdList: [id], } })
+    return resp.GroupInfo[0];
+  }
+
   /**
    * 创建群聊
    * @param group 组群信息
    */
-  async requestCreateGroup(group: { Type: IMGroup_Type, Owner_Account?: string, GroupId?: string, Name: string, Introduction?: string, Notification?: string, FaceUrl?: string, ApplyJoinOption?: IMGroup_ApplyJoinOption }) {
+  async requestCreateGroup(group: Partial<IMGroup>) {
     return this.fetch<{ GroupId: string }>(IMAPI_PATH.GROUP.CREATE_GROUPS, { body: group });
   }
 
@@ -170,8 +179,7 @@ class IM {
    * @param id 群聊id
    * @param data 修改信息
    */
-  async requestUpdateGroup(id: string, data: { GroupId?: string, Owner_Account?: string, Name?: string, Introduction?: string, Notification?: string, FaceUrl?: string, ApplyJoinOption?: IMGroup_ApplyJoinOption }) {
-    data.GroupId = id;
+  async requestUpdateGroup(data: Partial<IMGroup>) {
     return this.fetch(IMAPI_PATH.GROUP.UPDATE_GROUP_PROFILE, { body: data })
   }
 

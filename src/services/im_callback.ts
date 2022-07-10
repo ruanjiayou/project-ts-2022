@@ -2,8 +2,8 @@ import { BaseContext } from 'koa'
 import app from '../app'
 import _ from 'lodash'
 import Logger from '@root/utils/logger'
-import { MGroup } from '@root/types/model';
-import { local2clound } from '@root/utils/helper'
+import { IGroup_Status, MGroup } from '@root/types/model';
+import { local2clound, clound2local } from '@root/utils/helper'
 
 const logger = Logger('im_callback_service')
 
@@ -37,8 +37,10 @@ const service: { [key: string]: Function } = {
     const doc = await Group.findById(body.GroupId).lean(true)
     if (doc) {
       // 来自控制台的修改和API的修改是不一样的
-      const modified_data: any = _.pick(data, ['Introduction', 'Name'])
-      await Group.updateOne({ _id: data.GroupId }, { $set: local2clound(modified_data), $unset: { data: 1 } })
+      const modified_data: any = _.pick(data, ['Introduction', 'Name', 'ShutUpAllMember'])
+      modified_data.status = IGroup_Status.PASSED
+      modified_data.data = null
+      await Group.updateOne({ _id: data.GroupId }, { $set: clound2local(modified_data) })
     }
   },
 

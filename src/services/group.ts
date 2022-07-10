@@ -11,9 +11,11 @@ const logger = Logger('group_service')
 const service = {
   async createGroup(ctx: Context, data: any) {
     const Group: MGroup = ctx.models.Group
-    data = local2clound(ctx.request.body)
     if (!data.title) {
       ctx.throwBiz('COMMON.ParamError', { message: '标题不能为空' })
+    }
+    if (!data._id) {
+      ctx.throwBiz('COMMON.ParamError', { message: '创建群聊需要传入_id' })
     }
     checkFields(data);
     // 直播类型不需要加入方式
@@ -21,15 +23,7 @@ const service = {
       delete data.join_type;
     }
     try {
-      const result = await ctx.im.requestCreateGroup({
-        GroupId: data._id,
-        Type: data.type,
-        Owner_Account: data.owner_id,
-        Name: data.title,
-        Introduction: data.desc,
-        FaceUrl: data.cover,
-        Notification: data.announcement,
-      })
+      const result = await ctx.im.requestCreateGroup(local2clound(data))
       if (result.ErrorCode === 0) {
         const item: IGroup = await Group.create(data);
       }
@@ -57,14 +51,14 @@ const service = {
       ctx.throwBiz('COMMON.ResourceNotFound')
     }
     if (group.status !== IGroup_Status.PASSED) {
-      ctx.throwBiz('COMMON.CusomError', { message: '组群现在不能被修改' })
+      ctx.throwBiz('COMMON.CusomError', { message: '组群处于不能修改状态' })
     }
     const info: Partial<IMGroup> = local2clound(data)
     info.GroupId = _id;
     try {
-      const result = await ctx.im.requestUpdateGroup(_id, local2clound(data))
+      const result = await ctx.im.requestUpdateGroup(info)
       if (result.ErrorCode === 0) {
-        await Group.updateOne({ _id }, { $set: { data, status: IGroup_Status.UPDATING } })
+        await Group.updateOne({ _id }, { $set: _.pick(data, ['cover', 'title', 'desc', 'announcement', 'duanmu_enabled', 'owner_id']) })
       }
       return result;
     } catch (e) {

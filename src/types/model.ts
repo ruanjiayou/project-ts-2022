@@ -1,5 +1,5 @@
 import { Document, Model, Schema } from 'mongoose'
-import { IMGroup_ApplyJoinOption, IMGroup_Type } from '@root/utils/IMsdk'
+import { IMGroup_ApplyJoinOption, IMGroup_Type, IMGroup_AppdefineData } from '@root/utils/IMsdk'
 
 /**
  * 自定义条件对象
@@ -138,8 +138,9 @@ export interface IGroup extends BaseDocument, Document {
   type: IMGroup_Type;
   max_member?: number;
   join_type?: IMGroup_ApplyJoinOption;
-  custom_columns: [{ [key: string]: any }];
+  custom_columns: IMGroup_AppdefineData;
   data: any;
+  duanmu_enabled?: boolean;
 }
 
 export interface MGroup extends BaseModel<IGroup>, Model<IGroup> {

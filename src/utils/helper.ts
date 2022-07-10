@@ -2,6 +2,7 @@
 import { throwBiz } from '@root/extend/context'
 import { IGroup } from '@root/types/model';
 import { IMGroup } from '@root/utils/IMsdk'
+import _ from 'lodash';
 
 /**
   * 计算字符串所占的内存字节数，默认使用UTF-8的编码方式计算，也可制定为UTF-16
@@ -88,6 +89,12 @@ export function local2clound(data: IGroup): Partial<IMGroup> {
   if (data.desc) {
     result.Introduction = data.desc
   }
+  if (data.type) {
+    result.Type = data.type;
+  }
+  if (data.owner_id) {
+    result.Owner_Account = data.owner_id
+  }
   if (data.max_member) {
     result.MaxMemberNum = data.max_member
   }
@@ -103,5 +110,42 @@ export function local2clound(data: IGroup): Partial<IMGroup> {
   if (data.announcement) {
     result.Notification = data.announcement
   }
+  result.ShutUpAllMember = data.duanmu_enabled ? 'Off' : 'On'
   return result
+}
+
+/**
+ * 腾讯云group转数据库group
+ */
+export function clound2local(data: Partial<IMGroup>): Partial<IGroup> {
+  const result: Partial<IGroup> = { _id: data.GroupId }
+  if (data.Name) {
+    result.title = data.Name
+  }
+  if (data.Introduction) {
+    result.desc = data.Introduction
+  }
+  if (data.Owner_Account) {
+    result.owner_id = data.Owner_Account
+  }
+  if (data.MaxMemberNum) {
+    result.max_member = data.MaxMemberNum
+  }
+  if (data.AppDefineData) {
+    result.custom_columns = data.AppDefineData
+  }
+  if (data.ApplyJoinOption) {
+    result.join_type = data.ApplyJoinOption
+  }
+  if (data.FaceUrl) {
+    result.cover = data.FaceUrl
+  }
+  if (data.Type) {
+    result.type = data.Type;
+  }
+  if (data.Notification) {
+    result.announcement = data.Notification
+  }
+  result.duanmu_enabled = data.ShutUpAllMember === 'On' ? false : true
+  return result;
 }

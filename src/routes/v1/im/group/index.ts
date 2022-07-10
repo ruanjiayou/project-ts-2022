@@ -4,6 +4,7 @@ import { v4 } from 'uuid'
 import { IGroup, MGroup } from '@root/types/model';
 import Logger from '@root/utils/logger'
 import groupService from '../../../../services/group'
+import { IMGroup, IMResponse } from '@root/utils/IMsdk';
 
 const Router = require('koa-router')
 const logger = Logger('group_route')
@@ -46,11 +47,20 @@ router.get('/:id', async (ctx: Context) => {
   ctx.success(doc)
 })
 
+router.get('/:id/remote', async (ctx: Context) => {
+  const doc: IMGroup & IMResponse = await ctx.im.requestGetGroupDetail(ctx.params.id, []);
+  if (doc && doc.ErrorCode === 0) {
+    ctx.success(doc)
+  } else {
+    ctx.throwBiz('COMMON.ResourceNotFound')
+  }
+})
+
 router.post('/', async (ctx: Context) => {
-  const data: any = _.pick(ctx.request.body, ['_id', 'title', 'desc', 'type', 'cover', 'owner_id', 'announcement', 'join_type']);
+  const data: any = _.pick(ctx.request.body, ['_id', 'title', 'desc', 'type', 'cover', 'max_member', 'owner_id', 'custom_columns', 'announcement', 'join_type', 'duanmu_enabled', '']);
   logger.info(`create group: ${JSON.stringify(data)}`)
   const result = await groupService.createGroup(ctx, data);
-  if (result.ErrorCode === 0) {    
+  if (result.ErrorCode === 0) {
     ctx.success()
   } else {
     ctx.throwBiz('COMMON.ThirdPartFail', { message: '错误码:' + result.ErrorCode })
@@ -62,7 +72,6 @@ router.put('/:id', async (ctx: Context) => {
   if (result.ErrorCode === 0) {
     ctx.success({ _id: ctx.params.id })
   } else {
-    console.log(result)
     ctx.throwBiz('COMMON.ThirdPartFail', { message: '错误码:' + result.ErrorCode })
   }
 })
