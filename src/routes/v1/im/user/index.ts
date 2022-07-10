@@ -12,4 +12,10 @@ router.post('/signature', async (ctx: Context) => {
   ctx.success({ usersig })
 })
 
+router.get('/signature', async (ctx: Context) => {
+  const client = ctx.im;
+  const usersig = client.getSignratue();
+  ctx.success({ usersig })
+})
+
 export default router

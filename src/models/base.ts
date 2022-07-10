@@ -9,6 +9,7 @@ function init(query: any): Hql {
     order: query.order || {},
     attrs: query.attrs || {},
     lean: query.lean || false,
+    count: _.isBoolean(query.count) ? query.count : false,
     data: query.data,
     options: {},
     page: query.page || 1,
@@ -65,11 +66,17 @@ export const baseInfo = {
 export const baseStatic = {
   async getAll(opts = {}) {
     const opt = init(opts);
-    return this.find(opt.where).sort(opt.order).lean(opt.lean);
+    const items = await this.find(opt.where).sort(opt.order).lean(opt.lean);
+    return { items };
   },
   async getList(opts = {}) {
     const opt = init(opts);
-    return this.find(opt.where).skip((opt.page - 1) * opt.limit).limit(opt.limit).sort(opt.order).lean(opt.lean);
+    const result: { items: any, total?: number } = { items: [] }
+    result.items = await this.find(opt.where).skip((opt.page - 1) * opt.limit).limit(opt.limit).sort(opt.order).lean(opt.lean);
+    if (opt.count) {
+      result.total = await this.countDocuments(opt.where)
+    }
+    return result;
   },
   async getInfo(opts = {}) {
     const opt = init(opts);

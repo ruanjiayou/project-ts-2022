@@ -11,7 +11,17 @@ interface IM {
   created_at: number;
 }
 
-export enum GroupType {
+export enum IMStatus {
+  SUCCESS = 'OK',
+  FAIL = 'FAIL',
+}
+
+export enum IMPriority {
+  HIGH = 'HIGH',
+  LOW = 'LOW',
+}
+
+export enum IMGroup_Type {
   Public = 'Public',
   Private = 'Private',
   ChatRoom = 'ChatRoom',
@@ -19,17 +29,27 @@ export enum GroupType {
   BChatRoom = 'BChatRoom',
   Community = 'Community',
 }
-enum IMStatus {
-  SUCCESS = 'OK',
-  FAIL = 'FAIL',
+
+export enum IMGroup_ApplyJoinOption {
+  FreeAccess = 'FreeAccess',
+  NeedPermission = 'NeedPermission',
+  DisableApply = 'DisableApply',
 }
 
-enum IMPriority {
-  HIGH = 'HIGH',
-  LOW = 'LOW',
+export interface IMGroup_AppdefineData { [key: string]: any; }[]
+
+export interface IMGroup {
+  GroupId: string;
+  Name: string;
+  Introduction: string;
+  Notification: string;
+  FaceUrl: string;
+  MaxMemberNum: number;
+  ApplyJoinOption: IMGroup_ApplyJoinOption;
+  AppDefineData: IMGroup_AppdefineData
 }
 
-enum MSG_TYPE {
+enum IM_MSG_TYPE {
   TIMTextElem = 'TIMTextElem',
   TIMLocationElem = 'TIMLocationElem',
   TIMFaceElem = 'TIMFaceElem',
@@ -40,7 +60,7 @@ enum MSG_TYPE {
   TIMVideoFileElem = 'TIMVideoFileElem',
 }
 interface IM_MSG_BODY {
-  MsgType: MSG_TYPE,
+  MsgType: IM_MSG_TYPE,
   MsgContent: { Text: string }
   | { Desc: string, Latitude: number, Longitude: number }
   | { Index: number, Data: string }
@@ -51,7 +71,7 @@ interface IM_MSG_BODY {
   | { VideoUrl: string, VideoUUID: string, VideoSize: number, VideoSecond: number, VideoFormat: string, VideoDownloadFlog: number, ThumbUrl: string, ThumbUUID: string, ThumbSize: number, ThumbWidth: number, ThumbHeight: number, ThumbFormat: string, ThumbDownloadFlag: number }
 }
 
-interface IMResponse {
+export interface IMResponse {
   ActionStatus?: IMStatus;
   ErrorCode: number;
   ErrorInfo: string;
@@ -72,7 +92,8 @@ enum IM_API_GROUP {
   MUTED_USERS = 'v4/group_open_http_svc/get_group_shutted_uin',
   SEND_MESSAGE = 'v4/group_open_http_svc/send_group_msg',
   SEND_SYSTEM_MESSAGE = 'v4/group_open_http_svc/send_group_system_notification',
-  RECALL_MESSAGE = '/group_open_http_svc/group_msg_recall',
+  RECALL_MESSAGE = 'v4/group_open_http_svc/group_msg_recall',
+  UPDATE_GROUP_PROFILE = 'v4/group_open_http_svc/modify_group_base_info',
 }
 
 enum IM_API_OTHER {
@@ -80,7 +101,7 @@ enum IM_API_OTHER {
 
 }
 
-const IMAPI_PATH = {
+export const IMAPI_PATH = {
   ACCOUNT: IM_API_ACCOUNT,
   GROUP: IM_API_GROUP,
   OTHER: IM_API_OTHER,
@@ -132,7 +153,7 @@ class IM {
    * 获取所有组群
    * @param query 查询条件
    */
-  async requestGetGroups(query: { Limit: number, GroupType: GroupType, Next: number } = { Limit: 100, GroupType: GroupType.AVChatRoom, Next: 0 }) {
+  async requestGetGroups(query: { Limit: number, GroupType: IMGroup_Type, Next: number } = { Limit: 100, GroupType: IMGroup_Type.AVChatRoom, Next: 0 }) {
     return this.fetch<{ TotalCount: number, Next: number, GroupIdList: [{ GroupId: string }] }>(IMAPI_PATH.GROUP.GET_GROUPS, { query });
   }
 
@@ -140,8 +161,18 @@ class IM {
    * 创建群聊
    * @param group 组群信息
    */
-  async requestCreateGroup(group: { Type: GroupType, Owner_Account?: string, GroupId?: string, Name: string, Introduction?: string, Notification?: string, FaceUrl?: string, }) {
+  async requestCreateGroup(group: { Type: IMGroup_Type, Owner_Account?: string, GroupId?: string, Name: string, Introduction?: string, Notification?: string, FaceUrl?: string, ApplyJoinOption?: IMGroup_ApplyJoinOption }) {
     return this.fetch<{ GroupId: string }>(IMAPI_PATH.GROUP.CREATE_GROUPS, { body: group });
+  }
+
+  /**
+   * 修改群资料
+   * @param id 群聊id
+   * @param data 修改信息
+   */
+  async requestUpdateGroup(id: string, data: { GroupId?: string, Owner_Account?: string, Name?: string, Introduction?: string, Notification?: string, FaceUrl?: string, ApplyJoinOption?: IMGroup_ApplyJoinOption }) {
+    data.GroupId = id;
+    return this.fetch(IMAPI_PATH.GROUP.UPDATE_GROUP_PROFILE, { body: data })
   }
 
   /**
@@ -203,8 +234,17 @@ class IM {
    * @param apiPath 请求api路径
    * @param option 请求参数
    */
-  async fetch<T>(apiPath: string, option?: { query?: object, body?: object }): Promise<IMResponse & T> {
-    return await got.post<IMResponse & T>(`https://console.tim.qq.com/${apiPath}${option.query ? qs.stringify(option.query) : ''}`, { json: option.body }).json();
+  async fetch<T>(apiPath: string, option: { query?: { [key: string]: any }, body?: object } = { query: {} }): Promise<IMResponse & T> {
+    const query = {
+      sdkappid: this.sdkappid,
+      contenttype: 'json',
+      identifier: this.administrator,
+      usersig: Date.now() > this.created_at + this.expires * 1000 ? this.usersig : this.getSignratue(),
+      random: (Math.random() * 4294967295).toFixed(0),
+      ...option.query,
+    }
+    const url = `https://console.tim.qq.com/${apiPath}${query ? '?' + qs.stringify(query) : ''}`
+    return await got.post<IMResponse & T>(url, { json: option.body }).json();
   }
 }
 

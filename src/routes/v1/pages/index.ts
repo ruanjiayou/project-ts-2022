@@ -11,8 +11,8 @@ const router = new Router({
 
 router.get('/', async (ctx: Context) => {
   const Page: MPage = ctx.models.Page
-  const items: IPage[] = await Page.getAll();
-  ctx.success({ items })
+  const result: { items: IPage[] } = await Page.getAll();
+  ctx.success(result)
 })
 
 router.get('/:id', async (ctx: Context) => {

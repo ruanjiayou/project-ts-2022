@@ -11,8 +11,8 @@ const router = new Router({
 
 router.get('/', async (ctx: Context) => {
   const Component: MComponent = ctx.models.Component
-  const items: IComponent[] = await Component.getAll();
-  ctx.success({ items })
+  const result: { items: IComponent[] } = await Component.getAll();
+  ctx.success(result)
 })
 
 router.get('/:id', async (ctx: Context) => {

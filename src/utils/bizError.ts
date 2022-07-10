@@ -4,5 +4,6 @@ export default class BizError extends Error {
   constructor(name: string, params?: object) {
     super();
     this.bizName = name;
+    this.params = params;
   }
 }

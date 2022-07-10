@@ -1,4 +1,5 @@
 import { Document, Model, Schema } from 'mongoose'
+import { IMGroup_ApplyJoinOption, IMGroup_Type } from '@root/utils/IMsdk'
 
 /**
  * 自定义条件对象
@@ -8,6 +9,7 @@ export type Hql = {
   order?: object;
   attrs?: object;
   lean?: boolean;
+  count?: boolean;
   data?: object;
   options?: object;
   page?: number;
@@ -19,12 +21,12 @@ export interface BaseModel<T> {
    * 获取所有数据
    * @param hql 条件对象
    */
-  getAll(hql?: Hql): Promise<T[]>;
+  getAll(hql?: Hql): Promise<{ items: T[] }>;
   /**
    * 获取分页列表数据
    * @param hql 条件对象
    */
-  getList(hql?: Hql): Promise<T[]>;
+  getList(hql?: Hql): Promise<{ items: T[], total?: number, ended?: boolean }>;
   /**
    * 按条件获取一个数据详情
    * @param hql 条件对象
@@ -121,13 +123,23 @@ export interface MModule extends BaseModel<IModule>, Model<IModule> {
 
 }
 
+export enum IGroup_Status {
+  CREATING = 1,
+  PASSED = 2,
+  UPDATING = 3,
+  OFFLINE = 4,
+  FINISHED = 5,
+}
 export interface IGroup extends BaseDocument, Document {
   _id: string;
-  status: number;
-  tree_id: string;
-  parent_id: string;
-  component_id: string;
-  component_type: string;
+  status: IGroup_Status;
+  announcement: string;
+  owner_id?: string;
+  type: IMGroup_Type;
+  max_member?: number;
+  join_type?: IMGroup_ApplyJoinOption;
+  custom_columns: [{ [key: string]: any }];
+  data: any;
 }
 
 export interface MGroup extends BaseModel<IGroup>, Model<IGroup> {

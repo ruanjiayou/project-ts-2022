@@ -11,8 +11,8 @@ const router = new Router({
 
 router.get('/', async (ctx: Context) => {
   const Config: MConfig = ctx.models.Config
-  const items: IConfig[] = await Config.getAll();
-  ctx.success({ items })
+  const result: { items: IConfig[] } = await Config.getAll();
+  ctx.success(result)
 })
 
 router.get('/:id', async (ctx: Context) => {

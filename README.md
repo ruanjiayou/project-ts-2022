@@ -41,6 +41,12 @@ cross-env NODE_ENV=development nodemon --exec ts-node src/app.ts
 - jest测试
 - ✅ log4js日志
 - app.boot()增加周期
+- ✅ alias build后报错的问题
+- ✅ 生成.d.ts文件的问题
+- ✅ build后源文件目录由src变为dist的问题
+
+# IM
+- bizError.params 修改
 
 ## problem
 > package.json type设为commonjs,tsconfig.json里module设为commonjs.这样就能运行

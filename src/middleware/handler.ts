@@ -24,8 +24,10 @@ loader({ dir: path.join(constant.PATH.SRC, 'errors') }, (dirInfo) => {
 function generateByBizError(bizError: BizError, lang = 'zh-CN') {
   const data = packages[lang] || packages['zh-CN'];
   const result = _.get(data, bizError.bizName, { status: 200, code: -1, message: 'unknown' });
-  let message = result.message;
-  if (bizError.params) {
+  let message: any = result.message;
+  if (typeof message === 'function') {
+    message = message(bizError)
+  } if (bizError.params) {
     const keys = Object.keys(bizError.params);
     keys.forEach(key => {
       message = _.replace(message, `{${key}}`, bizError.params[key]);
