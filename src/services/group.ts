@@ -3,7 +3,7 @@ import _ from 'lodash'
 import Logger from '@root/utils/logger'
 import bizError from '@root/utils/bizError'
 import { IGroup, IGroup_Status, MGroup } from '@root/types/model';
-import { IMGroup, IMGroup_Type } from '@root/utils/IMsdk'
+import { IMGroup, IMGroup_Type, IMUserProfile } from '@root/utils/IMsdk'
 import { local2clound, checkFields } from '@root/utils/helper'
 
 const logger = Logger('group_service')
@@ -43,7 +43,7 @@ const service = {
       ctx.throwBiz('COMMON.ResourceNotFound', { message: '请传入参数' })
     }
     if (data.type) {
-      ctx.throwBiz('COMMON.CusomError', { message: '不能修改组群类型' })
+      ctx.throwBiz('COMMON.CustomError', { message: '不能修改组群类型' })
     }
     checkFields(data);
     const group: IGroup = await Group.findOne({ _id }).lean(true);
@@ -51,7 +51,7 @@ const service = {
       ctx.throwBiz('COMMON.ResourceNotFound')
     }
     if (group.status !== IGroup_Status.PASSED) {
-      ctx.throwBiz('COMMON.CusomError', { message: '组群处于不能修改状态' })
+      ctx.throwBiz('COMMON.CustomError', { message: '组群处于不能修改状态' })
     }
     const info: Partial<IMGroup> = local2clound(data)
     info.GroupId = _id;
@@ -70,6 +70,9 @@ const service = {
       }
     }
   },
+  async updateUser(ctx: Context, user_id: string, data: Partial<IMUserProfile>) {
+
+  }
 }
 
 export default service; 

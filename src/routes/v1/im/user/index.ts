@@ -12,4 +12,16 @@ router.post('/signature', async (ctx: Context) => {
   ctx.success({ usersig })
 })
 
+router.put('/:UserId/profile', async (ctx: Context) => {
+  try {
+    const result = await ctx.im.requestUpdateUserProfile(ctx.params.UserId, ctx.request.body)
+    if (result.ErrorCode === 0) {
+      ctx.success()
+    } else {
+      ctx.throwBiz('COMMON.ThridPart', { message: result.ErrorInfo })
+    }
+  } catch (e) {
+    ctx.throwBiz('COMMON.CustomError', { message: e.message })
+  }
+})
 export default router

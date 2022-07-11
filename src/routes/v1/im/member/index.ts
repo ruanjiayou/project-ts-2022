@@ -15,7 +15,7 @@ router.get('/', async (ctx: Context) => {
   const Group: MGroup = ctx.models.Group
   const result: IGroup = await Group.getInfo({ where: { _id: ctx.params.group_id }, lean: true, });
   if (result.type === IMGroup_Type.AVChatRoom) {
-    ctx.throwBiz('COMMON.CusomError', { message: '直播群不支持获取成员' })
+    ctx.throwBiz('COMMON.CustomError', { message: '直播群不支持获取成员' })
   } else {
     const query: any = ctx.query.roles
     const filter: any = {}

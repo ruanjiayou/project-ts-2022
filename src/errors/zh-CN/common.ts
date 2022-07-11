@@ -1,5 +1,5 @@
 export default {
-  CusomError: {
+  CustomError: {
     status: 200,
     code: -1,
     message(info: any = {}) {

@@ -58,6 +58,27 @@ export interface IMUser {
   Nick: string;
   FaceUrl: string;
 }
+
+export enum IMUser_GenderType {
+  Gender_Type_Unknown = 'Gender_Type_Unknown',
+  Gender_Type_Female = 'Gender_Type_Female',
+  Gender_Type_Male = 'Gender_Type_Male',
+}
+export interface IMUserProfile {
+  From_Account: string;
+  Tag_Profile_IM_Nick: string;
+  Tag_Profile_IM_Gender: string;
+  Tag_Profile_IM_BirthDay: number;
+  Tag_Profile_IM_Location: string;
+  Tag_Profile_IM_SelfSignature: string;
+  Tag_Profile_IM_AllowType: 'AllowType_Type_NeedConfirm' | 'AllowType_Type_AllowAny' | 'AllowType_Type_DenyAny',
+  Tag_Profile_IM_Language: number;
+  Tag_Profile_IM_Image: string;
+  Tag_Profile_IM_AdminForbidType: 'AdminForbid_Type_None' | 'AdminForbid_Type_SendOut';
+  Tag_Profile_IM_Level: number;
+  Tag_Profile_IM_Role: number;
+
+}
 export interface IMMember {
   GroupId: string;
   Member_Account: string;
@@ -108,6 +129,7 @@ enum IM_API_ACCOUNT {
   // 导入多个账号
   IMPORT_MULTI_ACCOUNT = 'v4/im_open_login_svc/multiaccount_import',
   DELETE_ACCOUNTS = 'v4/im_open_login_svc/account_delete',
+  UPDATE_USER_PROFILE = 'v4/profile/portrait_set',
 }
 
 enum IM_API_GROUP {
@@ -180,6 +202,18 @@ class IM {
    */
   async requestDeleteAccounts(items: { DeleteItem: [{ UserID: string }] }) {
     return this.fetch<{ ResultItem: [{ ResultCode: number, ResultInfo: string, UserID: string }] }>(IMAPI_PATH.ACCOUNT.DELETE_ACCOUNTS, { body: items });
+  }
+
+  /**
+   * 修改账号资料
+   */
+  async requestUpdateUserProfile(user_id: string, data: IMUserProfile) {
+    const ProfileItem: { Tag: string, Value: string | number }[] = [];
+    type UK = keyof IMUserProfile
+    Object.keys(data).forEach((key: UK) => {
+      ProfileItem.push({ Tag: key, Value: data[key] })
+    })
+    return this.fetch(IMAPI_PATH.ACCOUNT.UPDATE_USER_PROFILE, { body: { From_Account: user_id, ProfileItem } })
   }
 
   /**
