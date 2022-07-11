@@ -48,7 +48,7 @@ router.get('/:id', async (ctx: Context) => {
 })
 
 router.get('/:id/remote', async (ctx: Context) => {
-  const doc: IMGroup & IMResponse = await ctx.im.requestGetGroupDetail(ctx.params.id, []);
+  const doc: (IMGroup & IMResponse) | IMResponse = await ctx.im.requestGetGroupDetail(ctx.params.id, []);
   if (doc && doc.ErrorCode === 0) {
     ctx.success(doc)
   } else {

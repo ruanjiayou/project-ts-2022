@@ -110,7 +110,7 @@ export function local2clound(data: IGroup): Partial<IMGroup> {
   if (data.announcement) {
     result.Notification = data.announcement
   }
-  result.ShutUpAllMember = data.duanmu_enabled ? 'Off' : 'On'
+  result.ShutUpAllMember = data.duanmu_enabled ? 'Off' : 'On' 
   return result
 }
 

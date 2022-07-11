@@ -37,6 +37,7 @@ export enum IMGroup_ApplyJoinOption {
 }
 
 export interface IMGroup_AppdefineData { [key: string]: any; }[]
+export interface IMMember_AppdefinedData { Key: string, Value: string | number }[]
 
 export interface IMGroup {
   GroupId: string;
@@ -50,6 +51,26 @@ export interface IMGroup {
   ApplyJoinOption: IMGroup_ApplyJoinOption;
   AppDefineData: IMGroup_AppdefineData;
   ShutUpAllMember: "On" | "Off";
+}
+
+export interface IMUser {
+  UserID: string;
+  Nick: string;
+  FaceUrl: string;
+}
+export interface IMMember {
+  GroupId: string;
+  Member_Account: string;
+  Role: 'Admin' | 'Member' | 'Owner';
+  MsgFlag: IM_MSG_FLAG;
+  NameCard: string;
+  ShutUpTime: number;
+}
+
+export enum IM_MSG_FLAG {
+  AcceptAndNotify = 'AcceptAndNotify',
+  Discard = 'Discard',
+  AcceptNotNotify = 'AcceptNotNotify',
 }
 
 enum IM_MSG_TYPE {
@@ -81,6 +102,7 @@ export interface IMResponse {
 }
 
 enum IM_API_ACCOUNT {
+  GET_ACCOUNTS = 'v4/im_open_login_svc/account_check',
   // 导入单个账号
   IMPORT_SINGLE_ACCOUNT = 'v4/im_open_login_svc/account_import',
   // 导入多个账号
@@ -105,10 +127,17 @@ enum IM_API_OTHER {
 
 }
 
+enum IM_API_MEMBER {
+  UPDATE_MEMBER = 'v4/group_open_http_svc/modify_group_member_info',
+  COUNT_MEMBERS = 'v4/group_open_http_svc/get_online_member_num',
+  GET_MEMBER_LIST = 'v4/group_open_http_svc/get_group_member_info',
+}
+
 export const IMAPI_PATH = {
   ACCOUNT: IM_API_ACCOUNT,
   GROUP: IM_API_GROUP,
   OTHER: IM_API_OTHER,
+  MEMBER: IM_API_MEMBER,
 }
 
 class IM {
@@ -117,17 +146,17 @@ class IM {
     this.secret = secret;
     this.administrator = administrator;
     this.expires = expires;
-    this.usersig = this.getSignratue();
+    this.usersig = this.getSignratue(this.administrator);
     this.created_at = Date.now();
   }
   /**
    * 生成腾讯云IM用户签名
    * @returns userSig
    */
-  getSignratue(): string {
+  getSignratue(user_id: string): string {
     const api = new Api(this.sdkappid, this.secret)
     this.created_at = Date.now();
-    return api.genUserSig(this.administrator, this.expires);
+    return api.genUserSig(user_id, this.expires);
   }
   /**
    * 导入单个账号.userid长度不超过32
@@ -161,9 +190,9 @@ class IM {
     return this.fetch<{ TotalCount: number, Next: number, GroupIdList: [{ GroupId: string }] }>(IMAPI_PATH.GROUP.GET_GROUPS, { query });
   }
 
-  async requestGetGroupDetail(id: string, filter: string[]): Promise<IMGroup & IMResponse> {
-    const resp = await this.fetch<{ GroupInfo: [IMGroup & IMResponse] }>(IMAPI_PATH.GROUP.GET_DETAIL, { body: { GroupIdList: [id], } })
-    return resp.GroupInfo[0];
+  async requestGetGroupDetail(id: string, filter: string[]): Promise<(IMGroup & IMResponse) | IMResponse> {
+    const resp = await this.fetch<{ GroupInfo: [(IMGroup & IMResponse) & IMResponse] }>(IMAPI_PATH.GROUP.GET_DETAIL, { body: { GroupIdList: [id], } })
+    return resp.ErrorCode === 0 ? resp.GroupInfo[0] : resp;
   }
 
   /**
@@ -171,6 +200,7 @@ class IM {
    * @param group 组群信息
    */
   async requestCreateGroup(group: Partial<IMGroup>) {
+    console.log(group)
     return this.fetch<{ GroupId: string }>(IMAPI_PATH.GROUP.CREATE_GROUPS, { body: group });
   }
 
@@ -197,6 +227,27 @@ class IM {
    */
   async requestMutedUsers(GroupId: string) {
     return this.fetch<{ GroupId: string, ShuttedUinList: [{ Member_Account: string, ShuttedUntil: number }] }>(IMAPI_PATH.GROUP.MUTED_USERS, { body: { GroupId } });
+  }
+
+  /**
+   * 获取直播群在线人数
+   */
+  async requestCountMembers(GroupId: string) {
+    return this.fetch<IMResponse & { OnlineMemberNum: number }>(IMAPI_PATH.MEMBER.COUNT_MEMBERS, { body: { GroupId } })
+  }
+
+  /**
+   * 获取群成员列表
+   */
+  async requestGetMembers(GroupId: string, query: { MemberRoleFilter?: ('Admin' | 'Member' | 'Owner')[], Limit?: number, Offset?: number, Next?: string }) {
+    return this.fetch<{ Next?: string, MemberNum: number, MemberList: IMMember[] }>(IMAPI_PATH.MEMBER.GET_MEMBER_LIST, { body: { GroupId, ...query } })
+  }
+
+  /**
+   * 修改群成员资料.不支持直播群
+   */
+  async requestUpdateMember(GroupId: string, member: Partial<IMMember>) {
+    return this.fetch(IMAPI_PATH.MEMBER.UPDATE_MEMBER, { body: member })
   }
 
   /**
@@ -227,13 +278,13 @@ class IM {
   }
 
   /**
-   * 设置全局禁言
+   * 设置整个IM应用禁言
    * @param Set_Account 设置禁言的账号
    * @param type 全局禁言类型.group,user
    * @param time 禁言时间
    * @returns 
    */
-  async requestMutedAll(Set_Account: string, type: string, time: number) {
+  async requestMutedApp(Set_Account: string, type: string, time: number) {
     return this.fetch(IMAPI_PATH.OTHER.MUTED_ALL, { body: type === 'group' ? { Set_Account, GroupmsgNospeakingTime: time } : { Set_Account, C2CmsgNospeakingTime: time } })
   }
 
@@ -247,7 +298,7 @@ class IM {
       sdkappid: this.sdkappid,
       contenttype: 'json',
       identifier: this.administrator,
-      usersig: Date.now() > this.created_at + this.expires * 1000 ? this.usersig : this.getSignratue(),
+      usersig: Date.now() > this.created_at + this.expires * 1000 ? this.usersig : this.getSignratue(this.administrator),
       random: (Math.random() * 4294967295).toFixed(0),
       ...option.query,
     }
