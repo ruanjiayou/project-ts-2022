@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import qs from 'qs'
 import got from 'got'
 import Api from './im_sig'
@@ -220,8 +221,8 @@ class IM {
    * 获取所有组群
    * @param query 查询条件
    */
-  async requestGetGroups(query: { Limit: number, GroupType: IMGroup_Type, Next: number } = { Limit: 100, GroupType: IMGroup_Type.AVChatRoom, Next: 0 }) {
-    return this.fetch<{ TotalCount: number, Next: number, GroupIdList: [{ GroupId: string }] }>(IMAPI_PATH.GROUP.GET_GROUPS, { query });
+  async requestGetGroups(body: { Limit?: number, GroupType?: IMGroup_Type, Next?: number } = { Limit: 100, GroupType: IMGroup_Type.AVChatRoom, Next: 0 }) {
+    return this.fetch<{ TotalCount: number, Next: number, GroupIdList: [{ GroupId: string }] }>(IMAPI_PATH.GROUP.GET_GROUPS, { body });
   }
 
   async requestGetGroupDetail(id: string, filter: string[]): Promise<(IMGroup & IMResponse) | IMResponse> {
@@ -337,7 +338,8 @@ class IM {
       ...option.query,
     }
     const url = `https://console.tim.qq.com/${apiPath}${query ? '?' + qs.stringify(query) : ''}`
-    return await got.post<IMResponse & T>(url, { json: option.body }).json();
+    console.log(url, option.body)
+    return await got.post<IMResponse & T>(url, _.isEmpty(option.body) ? {} : { json: option.body }).json();
   }
 }
 

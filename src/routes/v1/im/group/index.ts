@@ -5,6 +5,7 @@ import { IGroup, MGroup } from '@root/types/model';
 import Logger from '@root/utils/logger'
 import groupService from '../../../../services/group'
 import { IMGroup, IMResponse } from '@root/utils/IMsdk';
+import { clound2local } from '@root/utils/helper';
 
 const Router = require('koa-router')
 const logger = Logger('group_route')
@@ -41,6 +42,15 @@ router.get('/', async (ctx: Context) => {
   ctx.success(result)
 })
 
+router.get('/remote', async (ctx: Context) => {
+  const result = await ctx.im.requestGetGroups()
+  if (result.ErrorCode === 0) {
+    ctx.success({ list: result.GroupIdList, total: result.TotalCount })
+  } else {
+    ctx.throwBiz('COMMON.ThirdPartFail', { message: '错误码:' + result.ErrorCode })
+  }
+})
+
 router.get('/:id', async (ctx: Context) => {
   const Group: MGroup = ctx.models.Group
   const doc: IGroup = await Group.getInfo({ where: { _id: ctx.params.id } });
@@ -48,8 +58,11 @@ router.get('/:id', async (ctx: Context) => {
 })
 
 router.get('/:id/remote', async (ctx: Context) => {
-  const doc: (IMGroup & IMResponse) | IMResponse = await ctx.im.requestGetGroupDetail(ctx.params.id, []);
+  const Group: MGroup = ctx.models.Group
+  const doc: any = await ctx.im.requestGetGroupDetail(ctx.params.id, []);
   if (doc && doc.ErrorCode === 0) {
+    const group = clound2local(doc)
+    const result = await Group.updateOne({ _id: ctx.params.id }, { $set: group }, { upsert: true })
     ctx.success(doc)
   } else {
     ctx.throwBiz('COMMON.ResourceNotFound')
