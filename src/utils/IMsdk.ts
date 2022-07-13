@@ -252,7 +252,7 @@ class IM {
    * 批量禁言/取消禁言(ShutUpTime设为0)
    * @param data 
    */
-  async requestMuteUser(data: { GroupId: string, Member_Account: string[], ShutUpTime: number }) {
+  async requestMuteUser(data: { GroupId: string, Members_Account: string[], ShutUpTime: number }) {
     return this.fetch(IMAPI_PATH.GROUP.MUTE_USER, { body: data })
   }
 

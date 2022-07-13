@@ -8,7 +8,7 @@ const Router = require('koa-router')
 const logger = Logger('muted_route')
 
 const router = new Router({
-  prefix: '/api/v1/im/group/:group_id/muted'
+  prefix: '/api/v1/im/groups/:group_id/muted'
 })
 
 router.get('/', async (ctx: Context) => {
@@ -21,7 +21,7 @@ router.get('/', async (ctx: Context) => {
 })
 
 router.post('/', async (ctx: Context) => {
-  const result = await ctx.im.requestMuteUser({ GroupId: ctx.params.group_id, Member_Account: ctx.request.body.members, ShutUpTime: ctx.request.body.seconds })
+  const result = await ctx.im.requestMuteUser({ GroupId: ctx.params.group_id, Members_Account: ctx.request.body.members, ShutUpTime: ctx.request.body.seconds })
   if (result.ErrorCode === 0) {
     ctx.success()
   } else {
@@ -30,7 +30,7 @@ router.post('/', async (ctx: Context) => {
 })
 
 router.delete('/', async (ctx: Context) => {
-  const result = await ctx.im.requestMuteUser({ GroupId: ctx.params.group_id, Member_Account: ctx.request.body.members, ShutUpTime: 0 })
+  const result = await ctx.im.requestMuteUser({ GroupId: ctx.params.group_id, Members_Account: ctx.request.body.members, ShutUpTime: 0 })
   if (result.ErrorCode === 0) {
     ctx.success()
   } else {

@@ -26,7 +26,7 @@ function generateByBizError(bizError: BizError, lang = 'zh-CN') {
   const result = _.get(data, bizError.bizName, { status: 200, code: -1, message: 'unknown' });
   let message: any = result.message;
   if (typeof message === 'function') {
-    message = message(bizError)
+    message = message(bizError.params)
   } if (bizError.params) {
     const keys = Object.keys(bizError.params);
     keys.forEach(key => {

@@ -11,7 +11,7 @@ const router = new Router({
 })
 
 const SUCCESS_RESPONSE = { ActionStatus: 'OK', ErrorInfo: '', ErrorCode: 0 };
-const FAIL_RESPONSE = { ActionStatus: 'FAIL', ERRORINFO: '', ERRORCODE: -1 };
+const FAIL_RESPONSE = { ActionStatus: 'FAIL', ErrorInfo: '', ErrorCode: 1 };
 
 router.post('/', async (ctx: Context) => {
   const query = ctx.query;
@@ -20,10 +20,15 @@ router.post('/', async (ctx: Context) => {
   const callback_type: string = body.CallbackCommand
   // Group.CallbackAfterGroupInfoChanged
   logger.info(`callback: ${JSON.stringify(query)}, ${JSON.stringify(body)}`)
+  if (parseInt(query.SdkAppid.toString(), 10) !== ctx.im.sdkappid) {
+    ctx.body = FAIL_RESPONSE;
+    return
+  }
   const fn = IMCallbackService[callback_type]
   if (fn) {
     try {
       const passed = await fn(body, query)
+      console.log(passed, 'result')
       ctx.body = passed ? SUCCESS_RESPONSE : FAIL_RESPONSE
     } catch (e) {
       logger.error(e.message)
