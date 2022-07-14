@@ -11,14 +11,14 @@ const router = new Router({
 
 router.get('/', async (ctx: Context) => {
   const Page: MPage = ctx.models.Page
-  const items: IPage[] = await Page.getAll();
-  ctx.success({ items })
+  const result: { items: IPage[] } = await Page.getAll();
+  ctx.success(result)
 })
 
 router.get('/:id', async (ctx: Context) => {
   const Page: MPage = ctx.models.Page
   const item: IPage = await Page.getInfo({ where: { _id: ctx.params.id } });
-  ctx.success({ item })
+  ctx.success(item)
 })
 
 router.post('/', async (ctx: Context) => {
@@ -26,7 +26,7 @@ router.post('/', async (ctx: Context) => {
   const data: any = _.pick(ctx.request.body, ['name', 'desc', 'type', 'value', 'order']);
   data._id = uuid.v4();
   const item = await Page.create({});
-  ctx.success({ item })
+  ctx.success(item)
 })
 
 router.put('/:id', async (ctx: Context) => {

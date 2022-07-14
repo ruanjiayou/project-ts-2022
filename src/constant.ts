@@ -48,9 +48,9 @@ const constant = {
   },
   PATH: {
     ROOT: root_path,
-    SRC: path.join(root_path, 'src'),
+    SRC: __dirname,
     STATIC: path.join(root_path, 'static'),
-    TEMPLATE: path.join(root_path, 'src/templates')
+    TEMPLATE: path.join(__dirname, 'templates')
   }
 }
 

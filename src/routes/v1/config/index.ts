@@ -11,14 +11,14 @@ const router = new Router({
 
 router.get('/', async (ctx: Context) => {
   const Config: MConfig = ctx.models.Config
-  const items: IConfig[] = await Config.getAll();
-  ctx.success({ items })
+  const result: { items: IConfig[] } = await Config.getAll();
+  ctx.success(result)
 })
 
 router.get('/:id', async (ctx: Context) => {
   const Config: MConfig = ctx.models.Config
   const item: IConfig = await Config.getInfo({ where: { _id: ctx.params.id } });
-  ctx.success({ item })
+  ctx.success(item)
 })
 
 router.post('/', async (ctx: Context) => {
@@ -26,7 +26,7 @@ router.post('/', async (ctx: Context) => {
   const data: any = _.pick(ctx.request.body, ['name', 'desc', 'type', 'value', 'order']);
   data._id = uuid.v4();
   const item: IConfig = await Config.create({});
-  ctx.success({ item })
+  ctx.success(item)
 })
 
 router.put('/:id', async (ctx: Context) => {

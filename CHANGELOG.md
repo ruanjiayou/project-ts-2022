@@ -7,3 +7,10 @@
 ## 2022-06-16 10:26:53
 - `npm run build`
 - 
+
+## 2022-7-15 05:20:31
+- constant.ts修改build后PATH错误的问题
+- 引入module-alias处理build后别名不识别问题
+- 错误码增加message函数功能,添加基础类型
+- build后loader加载ts错误
+- 

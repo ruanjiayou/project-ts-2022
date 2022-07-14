@@ -11,14 +11,14 @@ const router = new Router({
 
 router.get('/', async (ctx: Context) => {
   const Module: MModule = ctx.models.Module
-  const items: IModule[] = await Module.getAll();
-  ctx.success({ items })
+  const result: { items: IModule[] } = await Module.getAll();
+  ctx.success(result)
 })
 
 router.get('/:id', async (ctx: Context) => {
   const Module: MModule = ctx.models.Module
   const item: IModule = await Module.getInfo({ where: { _id: ctx.params.id } });
-  ctx.success({ item })
+  ctx.success(item)
 })
 
 router.post('/', async (ctx: Context) => {
@@ -26,7 +26,7 @@ router.post('/', async (ctx: Context) => {
   const data: any = _.pick(ctx.request.body, ['name', 'desc', 'type', 'value', 'order']);
   data._id = uuid.v4();
   const item = await Module.create({});
-  ctx.success({ item })
+  ctx.success(item)
 })
 
 router.put('/:id', async (ctx: Context) => {

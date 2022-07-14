@@ -11,20 +11,20 @@ const router = new Router({
 
 router.get('/', async (ctx: Context) => {
   const Component: MComponent = ctx.models.Component
-  const items: IComponent[] = await Component.getAll();
-  ctx.success({ items })
+  const result: { items: IComponent[] } = await Component.getAll();
+  ctx.success(result)
 })
 
 router.get('/:id', async (ctx: Context) => {
   const Component: MComponent = ctx.models.Component
   const item: IComponent = await Component.getInfo({ where: { _id: ctx.params.id } });
-  ctx.success({ item })
+  ctx.success(item)
 })
 
 router.delete('/:id', async (ctx: Context) => {
   const Component: MComponent = ctx.models.Component
   await Component.destroy({ where: { _id: ctx.params.id } });
-  ctx.success({})
+  ctx.success()
 })
 
 router.post('/', async (ctx: Context) => {
@@ -32,7 +32,7 @@ router.post('/', async (ctx: Context) => {
   const data: any = _.pick(ctx.request.body, ['title', 'name', 'desc', 'type']);
   data._id = v4();
   const item = await Component.create(data);
-  ctx.success({ item })
+  ctx.success(item)
 })
 
 router.put('/:id', async (ctx: Context) => {
