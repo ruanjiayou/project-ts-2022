@@ -7,7 +7,7 @@ interface IM {
   sdkappid: number;
   secret: string;
   expires: number;
-  administrator: string;
+  admin_account: string;
   usersig: string;
   created_at: number;
 }
@@ -18,8 +18,9 @@ export enum IMStatus {
 }
 
 export enum IMPriority {
-  HIGH = 'HIGH',
-  LOW = 'LOW',
+  HIGH = 'High',
+  NORMAL = 'Normal',
+  LOW = 'Low',
 }
 
 export enum IMGroup_Type {
@@ -95,7 +96,7 @@ export enum IM_MSG_FLAG {
   AcceptNotNotify = 'AcceptNotNotify',
 }
 
-enum IM_MSG_TYPE {
+export enum IM_MSG_TYPE {
   TIMTextElem = 'TIMTextElem',
   TIMLocationElem = 'TIMLocationElem',
   TIMFaceElem = 'TIMFaceElem',
@@ -105,7 +106,7 @@ enum IM_MSG_TYPE {
   TIMFileElem = 'TIMFileElem',
   TIMVideoFileElem = 'TIMVideoFileElem',
 }
-interface IM_MSG_BODY {
+export interface IM_MSG_BODY {
   MsgType: IM_MSG_TYPE,
   MsgContent: { Text: string }
   | { Desc: string, Latitude: number, Longitude: number }
@@ -164,22 +165,29 @@ export const IMAPI_PATH = {
 }
 
 class IM {
-  constructor(sdkappid: number, secret: string, administrator: string, expires: number) {
+  constructor(sdkappid: number, secret: string, admin_account: string, expires: number) {
     this.sdkappid = sdkappid;
     this.secret = secret;
-    this.administrator = administrator;
+    this.admin_account = admin_account;
     this.expires = expires;
-    this.usersig = this.getSignratue(this.administrator);
-    this.created_at = Date.now();
+    this.updateSignature();
   }
   /**
    * 生成腾讯云IM用户签名
    * @returns userSig
    */
-  getSignratue(user_id: string): string {
+  getSignature(user_id: string): string {
     const api = new Api(this.sdkappid, this.secret)
-    this.created_at = Date.now();
     return api.genUserSig(user_id, this.expires);
+  }
+
+  /**
+   * 更新账号签名和时间戳并返回签名
+   */
+  updateSignature(): string {
+    this.usersig = this.getSignature(this.admin_account)
+    this.created_at = Date.now()
+    return this.usersig
   }
   /**
    * 导入单个账号.userid长度不超过32
@@ -279,17 +287,33 @@ class IM {
   }
 
   /**
-   * 修改群成员资料.不支持直播群
+   * 修改群成员资料.不支持直播群(可以设置禁言和角色)
    */
   async requestUpdateMember(GroupId: string, member: Partial<IMMember>) {
     return this.fetch(IMAPI_PATH.MEMBER.UPDATE_MEMBER, { body: member })
   }
 
   /**
+   * 设置群成员角色
+   * @returns 
+   */
+  async requestSetMemberRole(GroupId: string, Member_Account: string, Role: 'Admin' | 'Member' | number) {
+    return this.fetch(IMAPI_PATH.MEMBER.UPDATE_MEMBER, { body: { GroupId, Member_Account, Role } })
+  }
+
+  /**
    * 发送普通消息
    * @param data 发送消息的数据
    */
-  async requestSendMessage(data: { GroupId: string, Random: number, From_Account?: string, MsgPriority?: IMPriority, MsgBody: {} }) {
+  async requestSendMessage(data: {
+    GroupId: string,
+    Random: number,
+    From_Account?: string,
+    To_Account?: string[],
+    ForbidCallbackControl?: ('ForbidBeforeSendMsgCallback' | 'ForbidAfterSendMsgCallback')[],
+    MsgPriority?: IMPriority,
+    MsgBody: IM_MSG_BODY,
+  }) {
     return this.fetch<{ MsgTime: number, MsgSeq: number, MsgDropReason: string }>(IMAPI_PATH.GROUP.SEND_MESSAGE, { body: data });
   }
 
@@ -298,7 +322,11 @@ class IM {
    * @param data 消息数据
    * @returns 
    */
-  async requestSendSystemMessage(data: { GroupId: string, Content: string, ToMembers_Account?: string[] }) {
+  async requestSendSystemMessage(data: {
+    GroupId: string,
+    Content: string,
+    ToMembers_Account?: string[],
+  }) {
     return this.fetch(IMAPI_PATH.GROUP.SEND_SYSTEM_MESSAGE, { body: data });
   }
 
@@ -332,9 +360,9 @@ class IM {
     const query = {
       sdkappid: this.sdkappid,
       contenttype: 'json',
-      identifier: this.administrator,
-      usersig: Date.now() > this.created_at + this.expires * 1000 ? this.usersig : this.getSignratue(this.administrator),
-      random: (Math.random() * 4294967295).toFixed(0),
+      identifier: this.admin_account,
+      usersig: Date.now() > this.created_at + this.expires * 1000 ? this.usersig : this.updateSignature(),
+      random: (Math.random() * 4294967295).toFixed(0), // 随机数字，五分钟数字相同认为是重复消息
       ...option.query,
     }
     const url = `https://console.tim.qq.com/${apiPath}${query ? '?' + qs.stringify(query) : ''}`

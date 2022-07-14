@@ -8,7 +8,7 @@ const router = new Router({
 
 router.post('/signature', async (ctx: Context) => {
   const client = ctx.im;
-  const usersig = client.getSignratue(ctx.request.body.user_id);
+  const usersig = client.getSignature(ctx.request.body.user_id);
   ctx.success({ usersig })
 })
 
