@@ -1,7 +1,7 @@
 import { Context } from 'koa'
 import _ from 'lodash'
 import uuid from 'uuid'
-import { IPage, MPage } from '@root/types/model';
+import { IPage, MPage } from '@type/model';
 
 const Router = require('koa-router')
 

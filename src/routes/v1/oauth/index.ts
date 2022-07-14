@@ -1,7 +1,7 @@
 import { Context } from 'koa'
 import Router from 'koa-router'
-import Logger from '@root/utils/logger'
-import { signIn, signUp, signOut, signOff, refreshToken } from '@root/services/user';
+import Logger from '@utils/logger'
+import { signIn, signUp, signOut, signOff, refreshToken } from '@services/user';
 
 const logger = Logger('oauth');
 const router = new Router({

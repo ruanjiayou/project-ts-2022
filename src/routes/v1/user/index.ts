@@ -1,8 +1,8 @@
 import { Context } from 'koa'
 import Router from 'koa-router'
-import Logger from '@root/utils/logger'
-import { profile } from '@root/services/user';
-import verify from '@root/middleware/verify';
+import Logger from '@utils/logger'
+import { profile } from '@services/user';
+import verify from '@middleware/verify';
 
 const router = new Router({
   prefix: '/api/v1/user'

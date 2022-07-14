@@ -1,9 +1,9 @@
 import nodeSchedule from 'node-schedule'
 import _ from 'lodash'
 import path from 'path'
-import config from '@root/config/index'
-import { Schedule } from '@root/types/schedule'
-import loader from '@root/utils/loader'
+import config from '@config'
+import { Schedule } from '@type/schedule'
+import loader from '@utils/loader'
 
 const schedule: Schedule = {
   tasks: {},

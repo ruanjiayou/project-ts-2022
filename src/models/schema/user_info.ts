@@ -1,8 +1,8 @@
 import { Schema, model } from 'mongoose'
 import crypto from 'crypto'
 import moment from 'moment-timezone'
-import config from '@root/config';
-import { IUser } from '@root/types/model';
+import config from '@config';
+import { IUser } from '@type/model';
 import { baseStatic, baseMethod, baseInfo } from '../base'
 
 const schema: Schema = new Schema({

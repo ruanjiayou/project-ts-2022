@@ -13,4 +13,4 @@
 - 引入module-alias处理build后别名不识别问题
 - 错误码增加message函数功能,添加基础类型
 - build后loader加载ts错误
-- 
+- 路径别名修改(ts声明文件夹type与库@types冲突,改用@type),src文件夹改用~别名

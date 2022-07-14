@@ -1,6 +1,6 @@
 import { Context, Next } from "koa";
 import jwt from 'jsonwebtoken'
-import Logger from '@root/utils/logger'
+import Logger from '@utils/logger'
 
 const logger = Logger('verify')
 

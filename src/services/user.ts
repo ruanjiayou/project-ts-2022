@@ -2,7 +2,7 @@ import { Context } from 'koa'
 import _ from 'lodash'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
-import { MUser, IUser } from '@root/types/model'
+import { MUser, IUser } from '@type/model'
 import * as uuid from 'uuid'
 import shortid from 'shortid'
 

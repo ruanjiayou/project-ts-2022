@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import moment from 'moment-timezone'
-import { Hql } from '@root/types/model'
-import config from '@root/config/index'
+import { Hql } from '@type/model'
+import config from '@config'
 
 function init(query: any): Hql {
   const hql: Hql = {

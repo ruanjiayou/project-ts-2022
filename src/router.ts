@@ -1,6 +1,6 @@
 import path from 'path'
 import Router from 'koa-router'
-import loader from '@root/utils/loader'
+import loader from '~/utils/loader'
 
 
 const router = new Router();
