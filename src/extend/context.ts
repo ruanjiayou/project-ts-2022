@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import BizError from '../utils/bizError';
+import BizError from '@utils/bizError';
 
 export function paging() {
   let { page, pn: limit } = this.request.query;

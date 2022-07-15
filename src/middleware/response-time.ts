@@ -1,5 +1,5 @@
 import { Context, Next } from 'koa'
-import Logger from '../utils/logger'
+import Logger from '@utils/logger'
 
 const logger = Logger('access')
 /**

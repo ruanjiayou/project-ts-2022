@@ -63,6 +63,6 @@
     "@config": "./dist/config",
     "@services": "./dist/services",
     "@middleware": "./dist/middleware",
-    "@type": "./dist/types"
+    "@type": "./dist/type"
   }
 }

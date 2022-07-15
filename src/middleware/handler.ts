@@ -1,10 +1,10 @@
 import { Context, Next } from 'koa'
 import _ from 'lodash'
 import path from 'path'
-import loader from '../utils/loader'
-import BizError from '../utils/bizError'
-import constant from '../constant'
-import { Package } from '../types/package'
+import loader from '@utils/loader'
+import BizError from '@utils/bizError'
+import constant from '~/constant'
+import { Package } from '@type/package'
 
 const packages: { [key: string]: Package } = {};
 

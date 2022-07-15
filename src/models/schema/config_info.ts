@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose'
-import { IConfig } from '../../types/model';
+import { IConfig } from '@type/model';
 import { baseMethod, baseStatic, baseInfo } from '../base'
 
 const schema: Schema = new Schema({

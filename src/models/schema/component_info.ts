@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose'
-import { IComponent } from '../../types/model';
+import { IComponent } from '@type/model';
 import { baseMethod, baseStatic, baseInfo } from '../base'
 
 const schema: Schema = new Schema({

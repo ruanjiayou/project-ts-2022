@@ -1,6 +1,6 @@
 if (process.env.NODE_ENV === 'production') require('module-alias/register');
 import app from './app'
-import config from './config/index'
+import config from './config'
 import mongoose from 'mongoose'
 
 const uri = `mongodb://${config.mongo.host + ':' + config.mongo.port}`;
