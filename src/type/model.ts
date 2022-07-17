@@ -46,6 +46,7 @@ interface BaseDocument<T = any, TQueryHelpers = any, DocType = any> {
   available: string;
   createdAt: Date;
   updatedAt: Date;
+  status: number;
 }
 
 export interface IConfig extends BaseDocument, Document {
@@ -60,9 +61,20 @@ export interface MConfig extends BaseModel<IConfig>, Model<IConfig> {
 
 }
 
+export interface IProject extends BaseDocument, Document {
+  user_id: string;
+}
+
+export interface MProject extends BaseModel<IProject>, Model<IProject> {
+  user_id: string;
+}
+
 export interface IComponent extends BaseDocument, Document {
   accepts: string[];
   status: number;
+  parent_id: string;
+  tree_id: string;
+  children?: IComponent[]
 }
 
 export interface MComponent extends BaseModel<IComponent>, Model<IComponent> {

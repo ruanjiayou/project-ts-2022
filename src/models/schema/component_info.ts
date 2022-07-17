@@ -15,9 +15,13 @@ const schema: Schema = new Schema({
   type: {
     type: String, // layout, ui, container, 
   },
-  status: {
-    type: Number,
-    default: 1,
+  parent_id: {
+    type: String,
+    default: ''
+  },
+  tree_id: {
+    type: String,
+    default: ''
   },
   accepts: [String],
   attrs: {

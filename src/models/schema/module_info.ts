@@ -4,10 +4,6 @@ import { baseMethod, baseStatic, baseInfo } from '../base'
 
 const schema: Schema = new Schema({
   ...baseInfo,
-  status: {
-    type: Number,
-    default: 1,
-  },
   tree_id: {
     type: String,
   },

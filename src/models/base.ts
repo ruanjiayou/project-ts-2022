@@ -52,6 +52,10 @@ export const baseInfo = {
     default: 1,
     comment: '上下线与status是有区别的',
   },
+  status: {
+    type: Number,
+    default: 1,
+  },
   createdAt: {
     type: Date,
     default: () => moment().tz(config.timezone).toDate(),

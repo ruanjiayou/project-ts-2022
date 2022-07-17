@@ -12,10 +12,6 @@ const schema: Schema = new Schema({
     type: String,
     default: ''
   },
-  status: {
-    type: Number,
-    default: 1,
-  },
   tree_id: {
     type: String,
   },
