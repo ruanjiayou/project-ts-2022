@@ -66,7 +66,7 @@ export interface IProject extends BaseDocument, Document {
 }
 
 export interface MProject extends BaseModel<IProject>, Model<IProject> {
-  user_id: string;
+  
 }
 
 export interface IComponent extends BaseDocument, Document {
@@ -78,8 +78,15 @@ export interface IComponent extends BaseDocument, Document {
 }
 
 export interface MComponent extends BaseModel<IComponent>, Model<IComponent> {
-  accepts: string[];
-  status: number;
+  
+}
+
+export interface IComponentType extends BaseDocument, Document {
+  order: number;
+}
+
+export interface MComponentType extends BaseModel<IComponentType>, Model<IComponentType> {
+
 }
 
 export interface IJob extends BaseDocument, Document {
@@ -113,7 +120,6 @@ export interface IPage extends BaseDocument, Document {
   _id: string;
   project_id: string;
   template: string;
-  status: number;
   tree_id: string;
 }
 
@@ -123,7 +129,6 @@ export interface MPage extends BaseModel<IPage>, Model<IPage> {
 
 export interface IModule extends BaseDocument, Document {
   _id: string;
-  status: number;
   tree_id: string;
   parent_id: string;
   component_id: string;
