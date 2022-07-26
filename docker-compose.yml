@@ -1,0 +1,23 @@
+version: "3"
+services: 
+  cms-admin:
+    image: cms-admin-api:0.0.3
+    restart: always
+    env_file:
+      - .env
+    # depends_on: 
+    #   - mongo
+    # links:
+    #   - mongo
+    networks:
+      - allinone
+    ports:
+      - "127.0.0.1:8993:8993"
+    environment:
+      - NODE_ENV=production
+    working_dir: "/projects/admin"
+    command: "npm run start"
+
+networks:
+  allinone:
+    external: true

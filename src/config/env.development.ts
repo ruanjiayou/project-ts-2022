@@ -1,17 +1,8 @@
 export default {
-  PORT: 3334,
+  PORT: process.env.PORT || 3334,
   timezone: 'Asia/Shanghai',
   language: 'zh-CN',
-  mongo: {
-    host: '127.0.0.1',
-    port: 27017,
-    user: 'root',
-    pass: '123456',
-    db: 'manage',
-    query: {
-      authSource: 'admin'
-    }
-  },
+  mongo_url: process.env.mongo_url || 'mongodb://root:123456@localhost:27017/manage?authSource=admin',
   USER_TOKEN: {
     ACCESS_TOKEN_SECRET: 'lp#yBMS0f!4IleTVnpA@',
     REFRESH_TOKEN_SECRET: '%Ph36Tv9VnpM27!A@',

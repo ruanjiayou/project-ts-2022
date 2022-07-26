@@ -1,13 +1,14 @@
 import { Schedule } from "./schedule";
 
 type Config = {
-  PORT: number;
+  PORT: number | string;
   /**
    * 制定服务器时区
    */
   timezone: string;
   language: string;
-  mongo: {
+  mongo_url: string;
+  mongo?: {
     host: string;
     port: number;
     user: string;
