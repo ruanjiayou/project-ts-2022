@@ -103,5 +103,5 @@ export async function profile(ctx: Context) {
   if (!user) {
     ctx.throwBiz('AUTH.AccountNotFound')
   }
-  return _.pick(user, ['account', 'nickname', 'avatar']);
+  return _.pick(user, ['account', 'nickname', 'avatar', 'id']);
 }
