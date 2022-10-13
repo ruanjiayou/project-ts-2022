@@ -12,10 +12,10 @@ export async function signIn(ctx: Context, data: any) {
   const where = { account: data.account };
   const user = await User.getInfo({ where });
   if (_.isNil(user)) {
-    ctx.throwBiz('AUTH.AccountError')
+    ctx.throwBiz('auth.AccountError')
   }
   if (!user.isEqualPass(data.pass)) {
-    ctx.throwBiz('AUTH.AccountError');
+    ctx.throwBiz('auth.AccountError');
   }
   const access_token = jwt.sign(
     {
@@ -50,7 +50,7 @@ export async function signUp(ctx: Context, data: any) {
   const User: MUser = ctx.models.User;
   const user = await User.getInfo({ where: { account: data.account } })
   if (user) {
-    ctx.throwBiz('AUTH.AccountExisted');
+    ctx.throwBiz('auth.AccountExisted');
   }
   const userInfo: any = _.pick(data, ['account', 'pass', 'avatar', 'nickname'])
   userInfo._id = uuid.v4();
@@ -90,10 +90,10 @@ export async function refreshToken(ctx: Context, refresh_token: string) {
       }
       return result;
     } else {
-      ctx.throwBiz('AUTH.tokenDisabled')
+      ctx.throwBiz('auth.tokenDisabled')
     }
   } catch (e) {
-    ctx.throwBiz('AUTH.tokenDisabled');
+    ctx.throwBiz('auth.tokenDisabled');
   }
 }
 
@@ -101,7 +101,7 @@ export async function profile(ctx: Context) {
   const User: MUser = ctx.models.User;
   const user = await User.getInfo({ where: { _id: ctx.state.user.id } })
   if (!user) {
-    ctx.throwBiz('AUTH.AccountNotFound')
+    ctx.throwBiz('auth.AccountNotFound')
   }
   return _.pick(user, ['account', 'nickname', 'avatar', 'id']);
 }

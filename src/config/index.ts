@@ -1,6 +1,14 @@
 import devConfig from './env.development'
 import prodConfig from './env.production'
+import testConfig from './env.test'
+import { Config } from '../type/app'
 
-const config = process.env.NODE_ENV === 'development' ? devConfig : prodConfig;
+const configs: { [key: string]: Config } = {
+  'development': devConfig,
+  'test': testConfig,
+  'production': prodConfig,
+}
 
-export default config;
+const env: string = process.env.NODE_ENV
+
+export default configs[env] || devConfig;

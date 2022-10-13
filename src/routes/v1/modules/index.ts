@@ -38,7 +38,7 @@ router.put('/:id', async (ctx: Context) => {
     await Module.updateOne(where, { $set: data });
     ctx.success()
   } else {
-    ctx.throwBiz('COMMON.ResourceNotFound')
+    ctx.throwBiz('common.ResourceNotFound')
   }
 })
 

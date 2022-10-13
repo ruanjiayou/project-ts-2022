@@ -1,6 +1,7 @@
 import { Schedule } from "./schedule";
+import { RedisClientType, RedisClientOptions } from 'redis'
 
-type Config = {
+export type Config = {
   PORT: number | string;
   /**
    * 制定服务器时区
@@ -8,13 +9,9 @@ type Config = {
   timezone: string;
   language: string;
   mongo_url: string;
-  mongo?: {
-    host: string;
-    port: number;
-    user: string;
-    pass: string;
-    db: string;
-    query: object | undefined;
+  redis: RedisClientOptions,
+  log_level: {
+    [key: string]: string,
   },
   USER_TOKEN: {
     ACCESS_TOKEN_SECRET: string;
@@ -47,6 +44,7 @@ declare module "koa" {
      * @param params 额外参数
      */
     success(data?: any, params?: any): void;
+    fail(data?: any, params?: any): void;
     /**
      * 中断业务逻辑,抛出错误码
      * @param name 业务错误名称

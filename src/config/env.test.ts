@@ -1,10 +1,8 @@
-import { URLSearchParams } from 'url'
-
 export default {
-  PORT: process.env.PORT,
-  timezone: process.env.timezone || '+08:00',
-  language: process.env.language || 'zh-CN',
-  mongo_url: process.env.mongo_url,
+  PORT: process.env.PORT || 3334,
+  timezone: 'Asia/Shanghai',
+  language: 'zh-CN',
+  mongo_url: process.env.mongo_url || 'mongodb://root:123456@localhost:27017/manage?authSource=admin',
   redis: {
     socket: {
       host: process.env.redis_host,
@@ -16,7 +14,7 @@ export default {
     ACCESS_TOKEN_SECRET: 'lp#yBMS0f!4IleTVnpA@',
     REFRESH_TOKEN_SECRET: '%Ph36Tv9VnpM27!A@',
     ACCESS_TOKEN_EXPIRES: 60 * 60 * 24 * 7,
-    REFRESH_TOKEN_EXPIRES: 60 * 60 * 24 * 7,
+    REFRESH_TOKEN_EXPIRES: 60 * 60 * 24 * 30,
   },
   log_level: {
     default: 'info',

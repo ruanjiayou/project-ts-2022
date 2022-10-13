@@ -12,7 +12,7 @@ loader({ dir: path.join(constant.PATH.SRC, 'errors') }, (dirInfo) => {
   const lang = dirInfo.filename;
   const langPackage: Package = {};
   loader({ dir: path.join(dirInfo.dir, dirInfo.filename) }, info => {
-    const name = info.filename.toUpperCase();
+    const name = info.filename.toLowerCase();
     const data = require(info.fullpath).default;
     if (data) {
       langPackage[name] = data;

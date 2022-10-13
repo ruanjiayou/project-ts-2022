@@ -38,11 +38,17 @@ cross-env NODE_ENV=development nodemon --exec ts-node src/app.ts
 - ✅ 统一鉴权
 - ✅ schedule(task/job)
 - email
-- jest测试
+- ✅ jest测试
 - ✅ log4js日志
-- app.boot()增加周期
+- ✅ app.prepare()增加周期
+- 管理后台作为一个应用,novel,download
+- 
 
 ## problem
 > package.json type设为commonjs,tsconfig.json里module设为commonjs.这样就能运行
 - `SyntaxError: Cannot use import statement outside a module`
 - `TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".ts" for D:\projects\project-ts\src\index.ts`
+
+
+project_member_info : user_id, role(owner,manage,user,guest)
+my project, project list

@@ -12,9 +12,9 @@ export default async function (ctx: Context, next: Next) {
   } catch (e) {
     logger.error(e);
     if (e.message === 'jwt expired') {
-      return ctx.throwBiz('tokenExpired');
+      return ctx.throwBiz('auth.tokenExpired');
     }
-    ctx.throwBiz('tokenNotFound');
+    ctx.throwBiz('auth.tokenNotFound');
   }
   await next()
 };

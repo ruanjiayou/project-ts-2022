@@ -61,12 +61,20 @@ export interface MConfig extends BaseModel<IConfig>, Model<IConfig> {
 
 }
 
+export interface IApp extends BaseDocument, Document {
+  user_id: string;
+}
+
+export interface MApp extends BaseModel<IApp>, Model<IApp> {
+
+}
+
 export interface IProject extends BaseDocument, Document {
   user_id: string;
 }
 
 export interface MProject extends BaseModel<IProject>, Model<IProject> {
-  
+
 }
 
 export interface IComponent extends BaseDocument, Document {
@@ -78,7 +86,7 @@ export interface IComponent extends BaseDocument, Document {
 }
 
 export interface MComponent extends BaseModel<IComponent>, Model<IComponent> {
-  
+
 }
 
 export interface IComponentType extends BaseDocument, Document {
@@ -136,5 +144,16 @@ export interface IModule extends BaseDocument, Document {
 }
 
 export interface MModule extends BaseModel<IModule>, Model<IModule> {
+
+}
+
+export interface IStock extends BaseDocument, Document {
+  _id: string;
+  se: string;
+  code: string;
+  price: number;
+}
+
+export interface MStock extends BaseModel<IStock>, Model<IStock> {
 
 }

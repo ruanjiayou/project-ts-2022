@@ -6,7 +6,7 @@ import { IConfig, MConfig } from '@type/model';
 const Router = require('koa-router')
 
 const router = new Router({
-  prefix: ''
+  prefix: '/api/v1/config'
 })
 
 router.get('/', async (ctx: Context) => {
@@ -38,7 +38,7 @@ router.put('/:id', async (ctx: Context) => {
     await Config.updateOne(where, { $set: data });
     ctx.success()
   } else {
-    ctx.throwBiz('COMMON.ResourceNotFound')
+    ctx.throwBiz('common.ResourceNotFound')
   }
 })
 

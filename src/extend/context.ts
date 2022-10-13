@@ -23,6 +23,10 @@ export function success(data: any, params: any = {}) {
   this.body = body;
 }
 
+export function fail() {
+
+}
+
 export function throwBiz(name: string, params?: object) {
   const bizError = new BizError(name, params);
   throw bizError;

@@ -28,6 +28,12 @@ const schema: Schema = new Schema({
     type: Object,
     default: {},
   },
+  source: {
+    type: {
+      type: String, // url group
+    },
+    url: String,
+  },
   order: {
     type: Number,
     default: 1

@@ -1,6 +1,7 @@
 import path from 'path'
 import log4js from 'log4js'
 import constant from '../constant'
+import config from '../config'
 
 log4js.configure({
   appenders: {
@@ -12,7 +13,7 @@ log4js.configure({
       pattern: 'yyyy-MM-dd',
       alwaysIncludePattern: true
     },
-    log: {
+    info: {
       type: 'dateFile',
       filename: path.join(constant.PATH.ROOT, 'logs/info.log'),
       keepFileExt: true,
@@ -20,14 +21,33 @@ log4js.configure({
       pattern: 'yyyy-MM-dd',
       alwaysIncludePattern: true
     },
+    error: {
+      type: 'dateFile',
+      filename: path.join(constant.PATH.ROOT, 'logs/error.log'),
+      keepFileExt: true,
+      fileNameSep: '_',
+      pattern: 'yyyy-MM-dd',
+      alwaysIncludePattern: true
+    },
     console: {
       type: 'console'
-    }
+    },
+    filter_log: {
+      type: 'logLevelFilter',
+      appender: 'info',
+      level: 'info',
+      maxLevel: 'info'
+    },
+    filter_error: {
+      type: 'logLevelFilter',
+      appender: 'error',
+      level: 'error'
+    },
   },
   categories: {
     default: {
-      appenders: ['console', 'log'],
-      level: 'info'
+      appenders: ['filter_log', 'filter_error'],
+      level: config.log_level.default,
     },
     access: {
       appenders: ['access'],

@@ -18,9 +18,9 @@ router.get('/menu', verify, async (ctx: Context) => {
   const Component: MComponent = ctx.models.Component
   const result: { items: IComponent[] } = await Component.getAll({ lean: true });
   result.items.forEach((item, i) => {
-    for (let j = i + 1; j < result.items.length; j++) {
+    for (let j = 0; j < result.items.length; j++) {
       const sub = result.items[j]
-      if (!sub) continue;
+      if (!sub || i === j) continue;
       if (sub.parent_id === item._id) {
         if (item.children) {
           item.children.push(sub)

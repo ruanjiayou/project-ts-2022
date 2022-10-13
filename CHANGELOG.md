@@ -14,3 +14,16 @@
 - 错误码增加message函数功能,添加基础类型
 - build后loader加载ts错误
 - 路径别名修改(ts声明文件夹type与库@types冲突,改用@type),src文件夹改用~别名
+
+## 2022-7-16 02:03:20
+- 修改别名错误
+
+message-queue
+admin-ts
+
+多项目管理
+component
+page
+后台构建cmpp式
+
+菜单: title,path,icon,order,project_id,parent_id

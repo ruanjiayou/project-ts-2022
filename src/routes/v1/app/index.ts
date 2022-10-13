@@ -1,44 +1,44 @@
 import { Context } from 'koa'
 import _ from 'lodash'
 import uuid from 'uuid'
-import { IProject, MProject } from '@type/model';
+import { IApp, MApp } from '@type/model';
 import verify from '@middleware/verify';
 
 const Router = require('koa-router')
 
 const router = new Router({
-  prefix: '/api/v1/user/projects'
+  prefix: '/api/v1/apps'
 })
 
 router.get('/', verify, async (ctx: Context) => {
-  const Project: MProject = ctx.models.Project
-  const result: { items: IProject[] } = await Project.getAll();
+  const App: MApp = ctx.models.App
+  const result: { items: IApp[] } = await App.getAll();
   ctx.success(result)
 })
 
 router.get('/:id', verify, async (ctx: Context) => {
-  const Project: MProject = ctx.models.Page
-  const item: IProject = await Project.getInfo({ where: { _id: ctx.params.id } });
+  const App: MApp = ctx.models.App
+  const item: IApp = await App.getInfo({ where: { _id: ctx.params.id } });
   ctx.success(item)
 })
 
 router.post('/', verify, async (ctx: Context) => {
-  const Project: MProject = ctx.models.Project
+  const App: MApp = ctx.models.App
   const data: any = _.pick(ctx.request.body, ['name', 'desc', 'title', 'status']);
   data._id = uuid.v4();
   data.user_id = ctx.state.user_id;
-  const item = await Project.create({});
+  const item = await App.create({});
   ctx.success(item)
 })
 
 router.put('/:id', verify, async (ctx: Context) => {
-  const Project: MProject = ctx.models.Project
+  const App: MApp = ctx.models.App
   const where = { _id: ctx.params.id };
-  const item: IProject = await Project.getInfo({ where })
+  const item: IApp = await App.getInfo({ where })
   if (item) {
-    const data: Partial<IProject> = _.pick(ctx.request.body, ['name', 'desc', 'title', 'status']);
+    const data: Partial<IApp> = _.pick(ctx.request.body, ['name', 'desc', 'title', 'status']);
     data.updatedAt = new Date()
-    await Project.updateOne(where, { $set: data });
+    await App.updateOne(where, { $set: data });
     ctx.success()
   } else {
     ctx.throwBiz('common.ResourceNotFound')

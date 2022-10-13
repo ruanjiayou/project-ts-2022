@@ -44,7 +44,7 @@ router.put('/:id', async (ctx: Context) => {
     await Component.updateOne(where, { $set: data });
     ctx.success()
   } else {
-    ctx.throwBiz('COMMON.ResourceNotFound')
+    ctx.throwBiz('common.ResourceNotFound')
   }
 })
 
