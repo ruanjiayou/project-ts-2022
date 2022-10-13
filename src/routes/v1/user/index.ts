@@ -16,7 +16,7 @@ router.get('/profile', verify, async (ctx: Context) => {
 
 router.get('/menu', verify, async (ctx: Context) => {
   const Component: MComponent = ctx.models.Component
-  const result: { items: IComponent[] } = await Component.getAll({ lean: true });
+  const result: { items: IComponent[] } = await Component.getAll({ order: [['order', 1]], lean: true });
   result.items.forEach((item, i) => {
     for (let j = 0; j < result.items.length; j++) {
       const sub = result.items[j]

@@ -1,7 +1,7 @@
 import { Context } from 'koa'
 import _ from 'lodash'
 import uuid from 'uuid'
-import { IConfig, MConfig } from '@type/model';
+import { Hql, IConfig, MConfig } from '@type/model';
 
 const Router = require('koa-router')
 
@@ -11,7 +11,12 @@ const router = new Router({
 
 router.get('/', async (ctx: Context) => {
   const Config: MConfig = ctx.models.Config
-  const result: { items: IConfig[] } = await Config.getAll();
+  const hql: Hql = { order: { order: 1 } }
+  const project_id = ctx.get('x-project_id');
+  if (project_id) {
+    hql.where = { project_id };
+  }
+  const result: { items: IConfig[] } = await Config.getAll(hql);
   ctx.success(result)
 })
 
