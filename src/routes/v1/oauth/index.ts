@@ -1,10 +1,10 @@
-import { Context } from 'koa'
+import { Context, DefaultState } from 'koa'
 import Router from 'koa-router'
 import Logger from '@utils/logger'
 import { signIn, signUp, signOut, signOff, refreshToken } from '@services/user';
 
 const logger = Logger('oauth');
-const router = new Router({
+const router = new Router<DefaultState, Context>({
   prefix: '/api/v1/oauth'
 });
 

@@ -1,10 +1,10 @@
-import { Context } from 'koa'
+import { Context, DefaultState } from 'koa'
 import Router from 'koa-router'
 import { IJob, MJob } from '@type/model';
 import Logger from '@utils/logger'
 
 const logger = Logger('task');
-const router = new Router({
+const router = new Router<DefaultState, Context>({
   prefix: '/api/v1/tasks'
 });
 

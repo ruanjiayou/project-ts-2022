@@ -34,7 +34,7 @@ router.delete('/:id', async (ctx: Context) => {
 
 router.post('/', async (ctx: Context) => {
   const Component: MComponent = ctx.models.Component
-  const data: any = _.pick(ctx.request.body, ['title', 'name', 'desc', 'type', 'parent_id', 'tree_id', 'attrs', 'order', 'project_id']);
+  const data: any = _.pick(ctx.request.body, ['title', 'name', 'desc', 'type', 'parent_id', 'tree_id', 'attrs', 'order', 'project_id', 'cover']);
   data._id = v4();
   const item = await Component.create(data);
   ctx.success(item)
@@ -45,7 +45,7 @@ router.put('/:id', async (ctx: Context) => {
   const where = { _id: ctx.params.id };
   const item: IComponent = await Component.getInfo({ where })
   if (item) {
-    const data = _.pick(ctx.request.body, ['title', 'name', 'desc', 'type', 'parent_id', 'tree_id', 'attrs', 'order', 'project_id']);
+    const data = _.pick(ctx.request.body, ['title', 'name', 'desc', 'type', 'parent_id', 'tree_id', 'attrs', 'order', 'project_id', 'cover']);
     await Component.updateOne(where, { $set: data });
     ctx.success()
   } else {
