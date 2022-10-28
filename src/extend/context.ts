@@ -24,7 +24,8 @@ export function success(data: any, params: any = {}) {
 }
 
 export function fail() {
-
+  this.status = 200;
+  this.body = { code: -1, message: '请求出错' };
 }
 
 export function throwBiz(name: string, params?: object) {

@@ -9,15 +9,26 @@ const schema: Schema = new Schema({
   _id: {
     type: String,
   },
-  available: {
+  user_id: {
+    type: String,
+  },
+  sns_id: {
+    type: String,
+  },
+  sns_type: {
+    type: String,
+  },
+  sns_name: { type: String, },
+  sns_icon: { type: String, },
+  sns_info: {
+    type: Object,
+  },
+  sns_status: {
     type: Number,
     default: 1,
-    comment: '上下线与status是有区别的',
   },
-  status: {
-    type: Number,
-    default: 1,
-  },
+  access_token: { type: String, },
+  refresh_token: { type: String, },
   createdAt: {
     type: Date,
     default: () => moment().tz(config.timezone).toDate(),
@@ -26,38 +37,16 @@ const schema: Schema = new Schema({
     type: Date,
     default: () => moment().tz(config.timezone).toDate(),
   },
-  account: {
-    type: String,
-  },
-  // phone email 
-  nickname: {
-    type: String,
-  },
-  avatar: {
-    type: String,
-    default: '',
-  },
-  pass: {
-    type: String,
-    default: '',
-  },
-  salt: {
-    type: String,
-    default: '',
-  },
 }, {
   strict: true,
-  collection: 'user_info',
+  collection: 'account_info',
 });
 
 schema.static(baseStatic);
 schema.method({
   ...baseMethod,
-  isEqualPass: function (pass: string) {
-    return crypto.createHmac('sha1', this._doc.salt).update(pass).digest('hex') === this._doc.pass;
-  }
 });
 
-const Model = model<IUser>('User', schema, 'user_info');
+const Model = model<IUser>('Account', schema, 'account_info');
 
 module.exports = Model

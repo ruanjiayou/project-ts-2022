@@ -89,6 +89,9 @@ export const baseStatic = {
   async destroy(opts = {}) {
     const opt = init(opts);
     return this.deleteMany(opt.where);
+  },
+  async getSession() {
+    return await this.startSession();
   }
 }
 
