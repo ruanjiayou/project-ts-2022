@@ -4,8 +4,9 @@ import app, { prepare } from './app'
 import config from './config'
 
 prepare(async (ctx: Context) => {
-  const { User, Component, ComponentType } = ctx.models
+  const { User, Project, Component, ComponentType } = ctx.models
   const users = await User.countDocuments()
+  const projects = await Project.countDocuments()
   const components = await Component.countDocuments()
   const componentTypes = await ComponentType.countDocuments()
   if (users === 0) {
@@ -22,7 +23,7 @@ prepare(async (ctx: Context) => {
       "__v": 0
     })
   }
-  if (components === 0 || componentTypes === 0) {
+  if (projects === 0 || components === 0 || componentTypes === 0) {
     console.log('数据需要初始化: mongoimport -u root -p 123456 -h 127.0.0.1 --authenticationDatabase admin -d test --collection test --file /data/backup/test/test.json')
   }
 }).then(() => {

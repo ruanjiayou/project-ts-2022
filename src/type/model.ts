@@ -8,5 +8,7 @@ export { IModule, MModule } from "./models/module";
 export { IPage, MPage } from "./models/page";
 export { IProject, MProject } from "./models/project";
 export { IUser, MUser } from "./models/user";
+export { IJob, MJob } from "./models/job";
+export { IStock, MStock } from "./models/stock";
 
 export { Hql } from "./models/base";
