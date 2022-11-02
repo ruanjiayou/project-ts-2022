@@ -2,10 +2,40 @@ import { Context } from 'koa'
 import _ from 'lodash'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
-import { MUser, MAccount, MLoginLog } from '@type/model'
+import { MUser, MAccount, MLoginLog, IUser } from '@type/model'
 import * as uuid from 'uuid'
 import shortid from 'shortid'
+import { Config } from '~/type/app'
 
+export async function createToken(user: Partial<IUser>, config: Config, param?: any) {
+  const USER_TOKEN = config.USER_TOKEN;
+  const access_token = 'bearer ' + jwt.sign(
+    {
+      id: user.id,
+      jti: shortid.generate(),
+      account: user.account,
+      avatar: user.avatar,
+      nickname: user.nickname,
+      project_id: param ? param.project_id : '',
+    },
+    USER_TOKEN.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: USER_TOKEN.ACCESS_TOKEN_EXPIRES,
+    }
+  );
+  const refresh_token = jwt.sign(
+    {
+      id: user.id,
+      createdAt: Date.now(),
+    },
+    USER_TOKEN.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: USER_TOKEN.REFRESH_TOKEN_EXPIRES,
+    }
+  );
+  // 返回信息
+  return { access_token, refresh_token }
+}
 export async function signIn(ctx: Context, data: any) {
   const User: MUser = ctx.models.User;
   const LoginLog: MLoginLog = ctx.models.LoginLog;
@@ -28,33 +58,10 @@ export async function signIn(ctx: Context, data: any) {
   }
   const accountInfo = await Account.getInfo({ where: { user_id: user._id, sns_type: 'self' } })
   // 生成token
-  const access_token = jwt.sign(
-    {
-      id: user.id,
-      jti: shortid.generate(),
-      account: user.account,
-      avatar: user.avatar,
-      nickname: user.nickname,
-      project_id: data.project_id || ''
-    },
-    USER_TOKEN.ACCESS_TOKEN_SECRET,
-    {
-      expiresIn: USER_TOKEN.ACCESS_TOKEN_EXPIRES,
-    }
-  );
-  const refresh_token = jwt.sign(
-    {
-      id: user.id,
-      createdAt: Date.now(),
-    },
-    USER_TOKEN.REFRESH_TOKEN_SECRET,
-    {
-      expiresIn: USER_TOKEN.REFRESH_TOKEN_EXPIRES,
-    }
-  );
+  const token = await createToken(user, ctx.config, { project_id: data.project_id || '' })
   await LoginLog.create({ user_id: user._id, account_id: accountInfo._id, log_id: ctx.ip, log_region: 'CN' });
   // 返回信息
-  return { access_token, refresh_token }
+  return token;
 }
 
 export async function signUp(ctx: Context, data: any) {
@@ -74,18 +81,20 @@ export async function signUp(ctx: Context, data: any) {
   try {
     // 创建账号信息并关联
     const userInfo: any = _.pick(data, ['email', 'phone', 'account', 'avatar', 'nickname', 'pass'])
-    const accountInfo: any = _.pick(data, ['sns_id', 'sns_type', 'access_token'])
-    userInfo._id = uuid.v4();
-    userInfo.salt = shortid.generate();
-    userInfo.pass = crypto.createHmac('sha1', userInfo.salt).update(userInfo.pass).digest('hex')
-    const info = await User.create(userInfo);
-    accountInfo._id = uuid.v4();
-    accountInfo.user_id = info._id;
-    if (!accountInfo.sns_id) {
-      accountInfo.sns_id = info._id;
-      accountInfo.sns_type = 'self';
+    if (data.sns_id && data.sns_type) {
+      const accountInfo: any = _.pick(data, ['sns_id', 'sns_type', 'access_token'])
+      userInfo._id = uuid.v4();
+      userInfo.salt = shortid.generate();
+      userInfo.pass = crypto.createHmac('sha1', userInfo.salt).update(userInfo.pass).digest('hex')
+      const info = await User.create(userInfo);
+      accountInfo._id = uuid.v4();
+      accountInfo.user_id = info._id;
+      if (!accountInfo.sns_id) {
+        accountInfo.sns_id = info._id;
+        accountInfo.sns_type = 'self';
+      }
+      await Account.create(accountInfo);
     }
-    await Account.create(accountInfo);
     ctx.success();
   } catch (e) {
     ctx.fail();
@@ -153,4 +162,8 @@ export async function profile(ctx: Context) {
     ctx.throwBiz('auth.AccountNotFound')
   }
   return _.pick(user, ['account', 'nickname', 'avatar', 'id']);
+}
+
+export async function bindEmail(email: string, code: string, sns_id: string, sns_type: string) {
+
 }

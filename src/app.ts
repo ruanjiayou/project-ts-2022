@@ -1,4 +1,4 @@
-import Koa from 'koa'
+import Koa, { Context, Next } from 'koa'
 import Convert from 'koa-convert'
 import Static from 'koa-static'
 import bodyParser from 'koa-bodyparser'
@@ -13,6 +13,8 @@ import handler from './middleware/handler'
 import { paging, success, fail, throwBiz } from './extend/context'
 import schedule from './schedule/index'
 import constant from './constant'
+import { extname } from 'path'
+import { createReadStream } from 'fs'
 
 const app = new Koa()
 app.context.config = config;
@@ -29,6 +31,19 @@ app.use(helmet({ noSniff: true }));
 app.use(bodyParser())
 app.use(Convert(Static(constant.PATH.STATIC)))
 app.use(handler)
+app.use(async (ctx: Context, next: Next) => {
+  const ext = extname(ctx.url)
+  await next()
+  if (!ctx.headerSent && !['jpg', 'gif', 'png'].includes(ext) && ctx.status === 404) {
+    ctx.status = 200;
+    ctx.respond = false
+    ctx.set('content-type', 'text/html; charset=utf-8')
+    const rs = createReadStream(constant.PATH.STATIC + '/index.html', { encoding: 'utf-8' });
+    rs.pipe(ctx.res)
+  } else {
+    // TODO: 自定义404
+  }
+})
 app.use(router.routes());
 
 export async function prepare(fn?: Function) {

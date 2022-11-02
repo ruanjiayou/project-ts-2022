@@ -29,7 +29,15 @@ const schema: Schema = new Schema({
   account: {
     type: String,
   },
-  // phone email 
+  area_code: {
+    type: String,
+  },
+  phone: {
+    type: String,
+  },
+  email: {
+    type: String,
+  },
   nickname: {
     type: String,
   },

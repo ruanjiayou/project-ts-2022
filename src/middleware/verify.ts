@@ -5,7 +5,7 @@ import Logger from '@utils/logger'
 const logger = Logger('verify')
 
 export default async function (ctx: Context, next: Next) {
-  const access_token = ctx.request.get('X-Token');
+  const access_token = (ctx.request.get('X-Token') || '').replace(/^Bearer /, '');
   try {
     const payload = await jwt.verify(access_token, ctx.config.USER_TOKEN.ACCESS_TOKEN_SECRET);
     ctx.state.user = payload;

@@ -29,6 +29,8 @@ const schema: Schema = new Schema({
   },
   access_token: { type: String, },
   refresh_token: { type: String, },
+  access_expires_in: { type: Number },
+  refresh_expires_in: { type: Number },
   createdAt: {
     type: Date,
     default: () => moment().tz(config.timezone).toDate(),
