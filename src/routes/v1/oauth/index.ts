@@ -1,12 +1,14 @@
 import { Context, DefaultState } from 'koa'
 import Router from 'koa-router'
 import Logger from '@utils/logger'
-import { signIn, signUp, signOut, signOff, refreshToken, createToken } from '@services/user';
+import { signIn, signUp, createToken } from '@services/user';
 import { IUser } from '@type/model';
 import got from 'got'
 import jwt from 'jsonwebtoken'
 import { v4 } from 'uuid';
+import { google, Auth, Common, people_v1 } from 'googleapis'
 
+let googleOAuth2Client: Auth.OAuth2Client = null;
 const logger = Logger('oauth');
 const router = new Router<DefaultState, Context>({
   prefix: '/api/v1/oauth'
@@ -23,24 +25,6 @@ router.post('/sign-up', async (ctx: Context) => {
   logger.info('sign-up');
   await signUp(ctx, ctx.request.body);
   ctx.success()
-});
-
-// 登出
-router.post('/sign-out', async (ctx: Context) => {
-  const data = await signOut(ctx, ctx.request.body);
-  ctx.success({ data })
-});
-
-// 注销
-router.post('/sign-off', async (ctx: Context) => {
-  const data = await signOff(ctx, ctx.request.body);
-  ctx.success({ data })
-});
-
-// 更新access_token
-router.post('/refresh', async (ctx: Context) => {
-  const data = await refreshToken(ctx, ctx.request.get('X-Token'))
-  ctx.success({ data })
 });
 
 // sns
@@ -69,8 +53,6 @@ router.post('/bind', async (ctx: Context) => {
     user = await MUser.getInfo({ where, lean: true });
     if (!user) {
       await MUser.create(user_info);
-    } else {
-      ctx.throwBiz('auth.AccountExisted')
     }
     await MAccount.updateOne({ sns_id: payload.sns_id, sns_type: payload.sns_type }, { $set: { user_id: user ? user._id : user_id } });
     const token = await createToken(user || user_info, ctx.config);
@@ -91,11 +73,36 @@ router.post('/send-code', async (ctx: Context) => {
   }
 })
 
+router.get('/google', async (ctx: Context) => {
+  const { MConfig } = ctx.models;
+  if (!googleOAuth2Client) {
+    const snsGoogle = await MConfig.getInfo({ where: { type: 'sns_type', name: 'google' }, lean: true });
+    console.log(snsGoogle, '?')
+    if (snsGoogle && snsGoogle.value.redirect_uris.length > 0) {
+      googleOAuth2Client = new google.auth.OAuth2(
+        snsGoogle.value.client_id,
+        snsGoogle.value.client_secret,
+        snsGoogle.value.redirect_uris[0],
+      );
+    } else {
+      ctx.status = 404;
+      ctx.body = '不支持的类型'
+      return;
+    }
+  }
+  const url = googleOAuth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile'],
+    include_granted_scopes: true
+  });
+  ctx.status = 301;
+  ctx.redirect(url);
+});
+
 router.get('/redirect/:sns_type', async (ctx: Context) => {
   const sns_type = ctx.params.sns_type;
   const { MConfig, MAccount, MUser } = ctx.models;
   const config: any = await MConfig.getInfo({ where: { type: 'sns_type', name: sns_type } })
-
   if (sns_type === 'github') {
     const code = ctx.request.query.code;
     const result: any = await got.post(`https://github.com/login/oauth/access_token?client_id=${config.value.client_id}&client_secret=${config.value.client_secret}&code=${code}`, {
@@ -114,15 +121,11 @@ router.get('/redirect/:sns_type', async (ctx: Context) => {
     const account = await MAccount.getInfo({ where: { sns_id: info.id + '', sns_type: 'github' }, lean: true });
     if (account && account.user_id) {
       const user = await MUser.getInfo({ where: { _id: account.user_id }, lean: true });
-      if (user) {
-        if (user.status !== 1) {
-          ctx.body = `登录失败,账号锁定`
-        } else {
-          const token = await createToken(user, ctx.config);
-          ctx.redirect(`/?access_token=${token.access_token.split(' ')[1]}&refresh_token=${token.refresh_token}&redirect=${encodeURI('/')}`);
-        }
+      if (user.status !== 1) {
+        ctx.body = `登录失败,账号锁定`
       } else {
-        ctx.redirect('/bind?bind_token=' + bind_token)
+        const token = await createToken(user, ctx.config);
+        ctx.redirect(`/?access_token=${token.access_token.split(' ')[1]}&refresh_token=${token.refresh_token}&redirect=${encodeURI('/')}`);
       }
     } else {
       await MAccount.updateOne({ sns_id: info.id + '', sns_type: 'github' }, {
@@ -143,6 +146,50 @@ router.get('/redirect/:sns_type', async (ctx: Context) => {
         }
       }, { upsert: true, new: true });
       ctx.redirect('/bind?bind_token=' + bind_token)
+    }
+  } else if (sns_type === 'google') {
+    if (!googleOAuth2Client) {
+      const snsGoogle = await MConfig.getInfo({ where: { type: 'sns_type', name: 'google' }, lean: true });
+      if (snsGoogle && snsGoogle.value.redirect_uris.length > 0) {
+        googleOAuth2Client = new google.auth.OAuth2(
+          snsGoogle.value.client_id,
+          snsGoogle.value.client_secret,
+          snsGoogle.value.redirect_uris[0],
+        );
+      }
+    }
+    const code = ctx.request.query.code as string;
+    const { tokens } = await googleOAuth2Client.getToken(code)
+    const info: any = await got.get('https://www.googleapis.com/oauth2/v2/userinfo?access_token=' + tokens.access_token).json();
+    const account = await MAccount.getInfo({ where: { sns_id: info.id + '', sns_type: 'google' }, lean: true });
+    if (!account || !account.user_id) {
+      await MAccount.updateOne({ sns_id: info.id + '', sns_type: 'google' }, {
+        $setOnInsert: {
+          _id: v4(),
+          createdAt: new Date(),
+        },
+        $set: {
+          sns_name: info.name,
+          sns_icon: info.picture,
+          sns_info: info,
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token,
+          access_expires_in: 3600,
+          refresh_expires_in: 3600,
+          user_id: '',
+          updatedAt: new Date(),
+        }
+      }, { upsert: true, new: true });
+      const bind_token = jwt.sign({ sns_id: info.id, sns_type }, ctx.config.USER_TOKEN.ACCESS_TOKEN_SECRET);
+      ctx.redirect('/bind?bind_token=' + bind_token)
+    } else {
+      const user = await MUser.getInfo({ where: { _id: account.user_id }, lean: true });
+      if (user.status !== 1) {
+        ctx.body = `登录失败,账号锁定`
+      } else {
+        const token = await createToken(user, ctx.config);
+        ctx.redirect(`/?access_token=${token.access_token.split(' ')[1]}&refresh_token=${token.refresh_token}&redirect=${encodeURI('/')}`);
+      }
     }
   } else {
     ctx.status = 404;

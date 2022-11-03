@@ -11,7 +11,7 @@ import { IUser } from '@type/model'
 
 export async function createToken(user: Partial<IUser>, param?: any) {
   const USER_TOKEN = config.USER_TOKEN;
-  const access_token = 'bearer ' + jwt.sign(
+  const access_token = 'Bearer ' + jwt.sign(
     {
       id: user.id,
       jti: shortid.generate(),
@@ -59,7 +59,7 @@ export async function signIn(ctx: Context, data: any) {
   const accountInfo = await MAccount.getInfo({ where: { user_id: user._id, sns_type: 'self' } })
   // 生成token
   const token = await createToken(user, { project_id: data.project_id || '' })
-  await MLoginLog.create({ user_id: user._id, account_id: accountInfo._id, log_id: ctx.ip, log_region: 'CN' });
+  await MLoginLog.create({ user_id: user._id, account_id: accountInfo ? accountInfo._id : '', log_id: ctx.ip, log_region: 'CN' });
   // 返回信息
   return token;
 }
