@@ -1,7 +1,7 @@
 import { Context } from 'koa'
 import _ from 'lodash'
 import uuid from 'uuid'
-import { IModule, MModule } from '@type/model';
+import { IModule } from '@type/model';
 
 const Router = require('koa-router')
 
@@ -10,32 +10,28 @@ const router = new Router({
 })
 
 router.get('/', async (ctx: Context) => {
-  const Module: MModule = ctx.models.Module
-  const result: { items: IModule[] } = await Module.getAll();
+  const result = await ctx.models.MModule.getAll();
   ctx.success(result)
 })
 
 router.get('/:id', async (ctx: Context) => {
-  const Module: MModule = ctx.models.Module
-  const item: IModule = await Module.getInfo({ where: { _id: ctx.params.id } });
+  const item = await ctx.models.MModule.getInfo({ where: { _id: ctx.params.id } });
   ctx.success(item)
 })
 
 router.post('/', async (ctx: Context) => {
-  const Module: MModule = ctx.models.Config
-  const data: any = _.pick(ctx.request.body, ['name', 'desc', 'type', 'value', 'order']);
+  const data: Partial<IModule> = _.pick(ctx.request.body, ['name', 'desc', 'type', 'value', 'order']);
   data._id = uuid.v4();
-  const item = await Module.create({});
+  const item = await ctx.models.MModule.create(data);
   ctx.success(item)
 })
 
 router.put('/:id', async (ctx: Context) => {
-  const Module: MModule = ctx.models.Config
   const where = { _id: ctx.params.id };
-  const item: IModule = await Module.getInfo({ where })
+  const item = await ctx.models.MModule.getInfo({ where })
   if (item) {
     const data = _.pick(ctx.request.body, ['name', 'desc', 'type', 'value', 'order']);
-    await Module.updateOne(where, { $set: data });
+    await ctx.models.MModule.updateOne(where, { $set: data });
     ctx.success()
   } else {
     ctx.throwBiz('common.ResourceNotFound')

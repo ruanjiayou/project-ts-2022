@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose'
 import crypto from 'crypto'
 import moment from 'moment-timezone'
 import config from '@config';
-import { IUser } from '@type/model';
+import { IUser, MUser } from '@type/model';
 import { baseStatic, baseMethod, baseInfo } from '../base'
 
 const schema: Schema = new Schema({
@@ -66,6 +66,6 @@ schema.method({
   }
 });
 
-const Model = model<IUser>('User', schema, 'user_info');
+const Model = model<IUser>('User', schema, 'user_info') as MUser;
 
-module.exports = Model
+export default Model

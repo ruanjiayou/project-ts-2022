@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose'
-import { IJob } from '@type/model';
+import { IJob, MJob } from '@type/model';
 import { baseStatic, baseMethod, baseInfo } from '../base'
 
 const schema: Schema = new Schema({
@@ -19,6 +19,6 @@ const schema: Schema = new Schema({
 schema.static(baseStatic);
 schema.method(baseMethod);
 
-const Model = model<IJob>('Job', schema, 'job_info');
+const Model = model<IJob>('Job', schema, 'job_info') as MJob;
 
-module.exports = Model
+export default Model

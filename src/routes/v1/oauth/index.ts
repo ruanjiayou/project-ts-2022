@@ -2,7 +2,7 @@ import { Context, DefaultState } from 'koa'
 import Router from 'koa-router'
 import Logger from '@utils/logger'
 import { signIn, signUp, signOut, signOff, refreshToken, createToken } from '@services/user';
-import { MConfig, MAccount, MUser, IUser } from '@type/model';
+import { IUser } from '@type/model';
 import got from 'got'
 import jwt from 'jsonwebtoken'
 import { v4 } from 'uuid';
@@ -49,13 +49,12 @@ router.post('/sns/:type', async (ctx: Context) => {
 });
 
 router.post('/bind', async (ctx: Context) => {
-  const Account: MAccount = ctx.models.Account
-  const User: MUser = ctx.models.User
+  const { MAccount, MUser } = ctx.models;
   const bind_token = ctx.query.bind_token as string;
   let { type, account, code, area_code } = ctx.request.body;
   try {
     const payload = await jwt.verify(bind_token, ctx.config.USER_TOKEN.ACCESS_TOKEN_SECRET) as any;
-    const accountInfo = await Account.getInfo({ where: { sns_id: payload.sns_id, sns_type: payload.sns_type }, lean: true });
+    const accountInfo = await MAccount.getInfo({ where: { sns_id: payload.sns_id, sns_type: payload.sns_type }, lean: true });
     const user_id = v4();
     let user: IUser = null;
     if (type === 'auto') {
@@ -67,13 +66,13 @@ router.post('/bind', async (ctx: Context) => {
       user_info.area_code = area_code;
       where.area_code = area_code;
     }
-    user = await User.getInfo({ where, lean: true });
+    user = await MUser.getInfo({ where, lean: true });
     if (!user) {
-      await User.create(user_info);
+      await MUser.create(user_info);
     } else {
       ctx.throwBiz('auth.AccountExisted')
     }
-    await Account.updateOne({ sns_id: payload.sns_id, sns_type: payload.sns_type }, { $set: { user_id: user ? user._id : user_id } });
+    await MAccount.updateOne({ sns_id: payload.sns_id, sns_type: payload.sns_type }, { $set: { user_id: user ? user._id : user_id } });
     const token = await createToken(user || user_info, ctx.config);
     ctx.success(token);
   } catch (e) {
@@ -94,10 +93,8 @@ router.post('/send-code', async (ctx: Context) => {
 
 router.get('/redirect/:sns_type', async (ctx: Context) => {
   const sns_type = ctx.params.sns_type;
-  const Config: MConfig = ctx.models.Config
-  const Account: MAccount = ctx.models.Account
-  const User: MUser = ctx.models.User
-  const config: any = await Config.getInfo({ where: { type: 'sns_type', name: sns_type } })
+  const { MConfig, MAccount, MUser } = ctx.models;
+  const config: any = await MConfig.getInfo({ where: { type: 'sns_type', name: sns_type } })
 
   if (sns_type === 'github') {
     const code = ctx.request.query.code;
@@ -114,9 +111,9 @@ router.get('/redirect/:sns_type', async (ctx: Context) => {
       }
     }).json();
     const bind_token = jwt.sign({ sns_id: info.id, sns_type }, ctx.config.USER_TOKEN.ACCESS_TOKEN_SECRET);
-    const account = await Account.getInfo({ where: { sns_id: info.id + '', sns_type: 'github' }, lean: true });
+    const account = await MAccount.getInfo({ where: { sns_id: info.id + '', sns_type: 'github' }, lean: true });
     if (account && account.user_id) {
-      const user = await User.getInfo({ where: { _id: account.user_id }, lean: true });
+      const user = await MUser.getInfo({ where: { _id: account.user_id }, lean: true });
       if (user) {
         if (user.status !== 1) {
           ctx.body = `登录失败,账号锁定`
@@ -128,7 +125,7 @@ router.get('/redirect/:sns_type', async (ctx: Context) => {
         ctx.redirect('/bind?bind_token=' + bind_token)
       }
     } else {
-      await Account.updateOne({ sns_id: info.id + '', sns_type: 'github' }, {
+      await MAccount.updateOne({ sns_id: info.id + '', sns_type: 'github' }, {
         $setOnInsert: {
           _id: v4(),
           createdAt: new Date(),
@@ -144,7 +141,7 @@ router.get('/redirect/:sns_type', async (ctx: Context) => {
           user_id: '',
           updatedAt: new Date(),
         }
-      }, { upsert: true });
+      }, { upsert: true, new: true });
       ctx.redirect('/bind?bind_token=' + bind_token)
     }
   } else {

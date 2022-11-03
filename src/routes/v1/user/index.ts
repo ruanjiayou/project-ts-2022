@@ -3,7 +3,7 @@ import Router from 'koa-router'
 import Logger from '@utils/logger'
 import { profile } from '@services/user';
 import verify from '@middleware/verify';
-import { IComponent, MComponent } from '@type/model';
+import models from '~/models/mongo'
 
 const router = new Router({
   prefix: '/api/v1/user'
@@ -15,8 +15,7 @@ router.get('/profile', verify, async (ctx: Context) => {
 });
 
 router.get('/menu', verify, async (ctx: Context) => {
-  const Component: MComponent = ctx.models.Component
-  const result: { items: IComponent[] } = await Component.getAll({ order: [['order', 1]], lean: true });
+  const result = await models.MComponent.getAll({ order: [['order', 1]], lean: true });
   result.items.forEach((item, i) => {
     for (let j = 0; j < result.items.length; j++) {
       const sub = result.items[j]

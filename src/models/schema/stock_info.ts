@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose'
-import { IComponent } from '@type/model';
+import { IStock, MStock } from '@type/model';
 import { baseMethod, baseStatic, baseInfo } from '../base'
 
 const schema: Schema = new Schema({
@@ -15,6 +15,6 @@ const schema: Schema = new Schema({
 schema.static(baseStatic);
 schema.method(baseMethod);
 
-const Model = model<IComponent>('Stock', schema, 'stock_info');
+const Model = model<IStock>('Stock', schema, 'stock_info') as MStock;
 
-module.exports = Model
+export default Model

@@ -1,5 +1,6 @@
 import { Context, DefaultState } from 'koa'
 import Router from 'koa-router'
+import models from '~/models/mongo'
 import { IJob, MJob } from '@type/model';
 import Logger from '@utils/logger'
 
@@ -21,9 +22,8 @@ router.patch('/:name', async (ctx: Context) => {
 })
 
 router.get('/:name/logs', async (ctx: Context) => {
-  const Job: MJob = ctx.models.Job;
   const where = { name: ctx.params.name }
-  const result: { items: IJob[] } = await Job.getList({ where });
+  const result = await models.MJob.getList({ where });
   ctx.success(result)
 })
 

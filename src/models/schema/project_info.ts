@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose'
-import { IPage } from '@type/model';
+import { IProject, MProject } from '@type/model';
 import { baseMethod, baseStatic, baseInfo } from '../base'
 
 const schema: Schema = new Schema({
@@ -16,6 +16,6 @@ const schema: Schema = new Schema({
 schema.static(baseStatic);
 schema.method(baseMethod);
 
-const Model = model<IPage>('Project', schema, 'project_info');
+const Model = model<IProject>('Project', schema, 'project_info') as MProject;
 
-module.exports = Model
+export default Model

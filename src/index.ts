@@ -4,13 +4,13 @@ import app, { prepare } from './app'
 import config from './config'
 
 prepare(async (ctx: Context) => {
-  const { User, Project, Component, ComponentType } = ctx.models
-  const users = await User.countDocuments()
-  const projects = await Project.countDocuments()
-  const components = await Component.countDocuments()
-  const componentTypes = await ComponentType.countDocuments()
+  const { MUser, MProject, MComponent, MComponentType } = ctx.models
+  const users = await MUser.countDocuments()
+  const projects = await MProject.countDocuments()
+  const components = await MComponent.countDocuments()
+  const componentTypes = await MComponentType.countDocuments()
   if (users === 0) {
-    await User.create({
+    await MUser.create({
       "_id": "6c669e34-0d6a-49da-853f-43e737ea9165",
       "available": 1,
       "account": "2048",

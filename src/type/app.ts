@@ -1,7 +1,8 @@
 import { Schedule } from "./schedule";
 import { RedisClientType, RedisClientOptions } from 'redis'
+import models from '~/models/mongo'
 
-export type Config = {
+export type IConfig = {
   PORT: number | string;
   /**
    * 制定服务器时区
@@ -21,7 +22,7 @@ export type Config = {
   },
 }
 
-type Pagination = {
+type IPagination = {
   /**
    * 页码,从1开始
    */
@@ -37,7 +38,7 @@ declare module "koa" {
     /**
      * 获取请求的分页参数
      */
-    paging(): Pagination;
+    paging(): IPagination;
     /**
      * 服务器正常返回数据
      * @param data 返回的数据
@@ -51,10 +52,8 @@ declare module "koa" {
      * @param params 额外参数
      */
     throwBiz(name: string, params?: object): void;
-    config: Config;
-    models: {
-      [modelName: string]: any;
-    },
+    config: IConfig;
+    models: typeof models,
     schedule: Schedule
   }
 }

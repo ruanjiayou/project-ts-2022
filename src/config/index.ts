@@ -1,9 +1,9 @@
 import devConfig from './env.development'
 import prodConfig from './env.production'
 import testConfig from './env.test'
-import { Config } from '../type/app'
+import { IConfig } from '../type/app'
 
-const configs: { [key: string]: Config } = {
+const configs: { [key: string]: IConfig } = {
   'development': devConfig,
   'test': testConfig,
   'production': prodConfig,

@@ -3,10 +3,10 @@ import { BaseModel, BaseDocument } from "./base";
 
 export interface IConfig extends BaseDocument, Document {
 
-  project_id?: string;
-  type?: string;
-  value?: object;
-  order?: number;
+  project_id: string;
+  type: string;
+  value: any;
+  order: number;
 }
 
 export interface MConfig extends BaseModel<IConfig>, Model<IConfig> {

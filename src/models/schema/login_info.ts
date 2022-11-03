@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose'
 import moment from 'moment-timezone'
 import config from '@config';
-import { IUser } from '@type/model';
+import { ILoginLog, MLoginLog } from '@type/model';
 import { baseStatic, baseMethod, baseInfo } from '../base'
 import { v4 } from 'uuid';
 
@@ -32,6 +32,6 @@ schema.method({
   ...baseMethod,
 });
 
-const Model = model<IUser>('LoginLog', schema, 'login_info');
+const Model = model<ILoginLog>('LoginLog', schema, 'login_info') as MLoginLog;
 
-module.exports = Model
+export default Model
