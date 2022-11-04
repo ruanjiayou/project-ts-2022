@@ -13,7 +13,7 @@ export async function createToken(user: Partial<IUser>, param?: any) {
   const USER_TOKEN = config.USER_TOKEN;
   const access_token = 'Bearer ' + jwt.sign(
     {
-      id: user.id,
+      id: user._id,
       jti: shortid.generate(),
       account: user.account,
       avatar: user.avatar,

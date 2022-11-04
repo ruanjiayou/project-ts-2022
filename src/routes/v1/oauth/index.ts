@@ -6,9 +6,11 @@ import { IUser } from '@type/model';
 import got from 'got'
 import jwt from 'jsonwebtoken'
 import { v4 } from 'uuid';
-import { google, Auth, Common, people_v1 } from 'googleapis'
+import { google, Auth } from 'googleapis'
+import AlipaySdk from 'alipay-sdk';
 
 let googleOAuth2Client: Auth.OAuth2Client = null;
+let alipaySdk: AlipaySdk = null;
 const logger = Logger('oauth');
 const router = new Router<DefaultState, Context>({
   prefix: '/api/v1/oauth'
@@ -50,12 +52,9 @@ router.post('/bind', async (ctx: Context) => {
       user_info.area_code = area_code;
       where.area_code = area_code;
     }
-    user = await MUser.getInfo({ where, lean: true });
-    if (!user) {
-      await MUser.create(user_info);
-    }
-    await MAccount.updateOne({ sns_id: payload.sns_id, sns_type: payload.sns_type }, { $set: { user_id: user ? user._id : user_id } });
-    const token = await createToken(user || user_info, ctx.config);
+    user = await MUser.findOneAndUpdate(where, { $setOnInsert: user_info }, { upsert: true, new: true });
+    await MAccount.updateOne({ sns_id: payload.sns_id, sns_type: payload.sns_type }, { $set: { user_id: user._id } });
+    const token = await createToken(user, ctx.config);
     ctx.success(token);
   } catch (e) {
     logger.error(e);
@@ -82,7 +81,7 @@ router.get('/google', async (ctx: Context) => {
       googleOAuth2Client = new google.auth.OAuth2(
         snsGoogle.value.client_id,
         snsGoogle.value.client_secret,
-        snsGoogle.value.redirect_uris[0],
+        process.env.NODE_ENV === 'production' ? snsGoogle.value.redirect_uris[1] : snsGoogle.value.redirect_uris[0],
       );
     } else {
       ctx.status = 404;
@@ -99,6 +98,14 @@ router.get('/google', async (ctx: Context) => {
   ctx.redirect(url);
 });
 
+router.get('/alipay_pc', async (ctx: Context) => {
+  const { MConfig } = ctx.models;
+  const config: any = await MConfig.getInfo({ where: { type: 'sns_type', name: 'alipay_pc' } })
+  if (config) {
+    ctx.status = 301;
+    ctx.redirect(`https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=${config.value.app_id}&scope=auth_user&redirect_uri=${encodeURIComponent(config.value.redirect_uri)}`);
+  }
+})
 router.get('/redirect/:sns_type', async (ctx: Context) => {
   const sns_type = ctx.params.sns_type;
   const { MConfig, MAccount, MUser } = ctx.models;
@@ -190,6 +197,75 @@ router.get('/redirect/:sns_type', async (ctx: Context) => {
         const token = await createToken(user, ctx.config);
         ctx.redirect(`/?access_token=${token.access_token.split(' ')[1]}&refresh_token=${token.refresh_token}&redirect=${encodeURI('/')}`);
       }
+    }
+  } else if (sns_type === 'alipay_pc') {
+    const code = ctx.request.query.auth_code;
+    if (!alipaySdk) {
+      const config: any = await MConfig.getInfo({ where: { type: 'sns_type', name: 'alipay_pc' } })
+      if (config) {
+        alipaySdk = new AlipaySdk({
+          appId: config.value.app_id,
+          privateKey: config.value.app_secret_key,
+          encryptKey: config.value.aes_secret,
+          alipayPublicKey: config.value.alipay_public_key,
+          keyType: 'PKCS8',
+          signType: 'RSA2',
+        });
+      }
+    }
+    if (alipaySdk) {
+      const result: {
+        accessToken: string,
+        alipayUserId: string,
+        authStart: string,
+        expiresIn: number,
+        reExpiresIn: number,
+        refreshToken: string,
+        userId: string,
+      } = await alipaySdk.exec('alipay.system.oauth.token', {
+        grantType: 'authorization_code',
+        code,
+      });
+      const userInfo: {
+        avatar: string,
+        nickName: string,
+        userId: string,
+      } = await alipaySdk.exec('alipay.user.info.share', {
+        auth_token: result.accessToken
+      });
+      const account = await MAccount.getInfo({ where: { sns_id: result.userId + '', sns_type: 'alipay_pc' }, lean: true });
+      if (!account || !account.user_id) {
+        await MAccount.updateOne({ sns_id: result.userId + '', sns_type: 'alipay_pc' }, {
+          $setOnInsert: {
+            _id: v4(),
+            createdAt: new Date(),
+          },
+          $set: {
+            sns_name: userInfo.nickName,
+            sns_icon: userInfo.avatar,
+            sns_info: userInfo,
+            access_token: result.accessToken,
+            refresh_token: result.refreshToken,
+            access_expires_in: result.expiresIn,
+            refresh_expires_in: result.reExpiresIn,
+            user_id: userInfo.userId,
+            updatedAt: new Date(),
+          }
+        }, { upsert: true, new: true });
+        const bind_token = jwt.sign({ sns_id: result.userId, sns_type: 'alipay_pc' }, ctx.config.USER_TOKEN.ACCESS_TOKEN_SECRET);
+        ctx.redirect('/bind?bind_token=' + bind_token)
+      } else {
+        const user = await MUser.getInfo({ where: { _id: account.user_id }, lean: true });
+        if (user.status !== 1) {
+          ctx.body = `登录失败,账号锁定`
+        } else {
+          const token = await createToken(user, ctx.config);
+          ctx.redirect(`/?access_token=${token.access_token.split(' ')[1]}&refresh_token=${token.refresh_token}&redirect=${encodeURI('/')}`);
+        }
+      }
+    } else {
+      ctx.status = 404;
+      ctx.body = 'fail'
     }
   } else {
     ctx.status = 404;
