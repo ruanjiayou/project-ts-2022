@@ -45,7 +45,7 @@ declare module "koa" {
      * @param params 额外参数
      */
     success(data?: any, params?: any): void;
-    fail(data?: any, params?: any): void;
+    fail(message?: string, code?: number): void;
     /**
      * 中断业务逻辑,抛出错误码
      * @param name 业务错误名称
@@ -54,6 +54,7 @@ declare module "koa" {
     throwBiz(name: string, params?: object): void;
     config: IConfig;
     models: typeof models,
-    schedule: Schedule
+    schedule: Schedule;
+    getAliToken(): Promise<string>;
   }
 }

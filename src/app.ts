@@ -15,6 +15,7 @@ import schedule from './schedule/index'
 import constant from './constant'
 import { extname } from 'path'
 import { createReadStream } from 'fs'
+import createGetToken from './utils/ali'
 
 const app = new Koa()
 app.context.config = config;
@@ -27,7 +28,7 @@ app.context.fail = fail;
 
 app.use(responseTime);
 app.use(cors);
-app.use(helmet({ noSniff: true }));
+app.use(helmet({ noSniff: true, contentSecurityPolicy: false }));
 app.use(bodyParser())
 app.use(Convert(Static(constant.PATH.STATIC)))
 app.use(handler)
@@ -48,6 +49,11 @@ app.use(router.routes());
 
 export async function prepare(fn?: Function) {
   await mongoose.connect(config.mongo_url)
+  const cfg = await models.MConfig.getInfo({ where: { name: 'ali_speech_ram' }, lean: true });
+  if (cfg) {
+    const getToken = await createGetToken(cfg.value.access_key_id, cfg.value.access_key_secret);
+    app.context.getAliToken = getToken;
+  }
   if (fn) {
     await fn(app.context)
   }

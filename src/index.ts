@@ -9,21 +9,7 @@ prepare(async (ctx: Context) => {
   const projects = await MProject.countDocuments()
   const components = await MComponent.countDocuments()
   const componentTypes = await MComponentType.countDocuments()
-  if (users === 0) {
-    await MUser.create({
-      "_id": "6c669e34-0d6a-49da-853f-43e737ea9165",
-      "available": 1,
-      "account": "2048",
-      "nickname": "max",
-      "avatar": "",
-      "pass": "152bc08b6570948914d42c3bddbde340445c2d89",
-      "salt": "zMVpRYmzx",
-      "createdAt": new Date("2022-06-17T06:17:46.655Z"),
-      "updatedAt": new Date("2022-06-17T06:17:46.657Z"),
-      "__v": 0
-    })
-  }
-  if (projects === 0 || components === 0 || componentTypes === 0) {
+  if (users === 0 || projects === 0 || components === 0 || componentTypes === 0) {
     console.log('数据需要初始化: mongoimport -u root -p 123456 -h 127.0.0.1 --authenticationDatabase admin -d test --collection test --file /data/backup/test/test.json')
   }
 }).then(() => {
