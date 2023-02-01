@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "cross-env NODE_ENV=production node dist/index.js",
-    "dev": "cross-env NODE_ENV=development nodemon --watch src -e ts,tsx --exec ts-node -r tsconfig-paths/register ./src/index.ts",
+    "dev": "cross-env NODE_ENV=development HTTPS_PROXY=http://localhost:7890 nodemon --watch src -e ts,tsx --exec ts-node -r tsconfig-paths/register ./src/index.ts",
     "build": "rm -rf dist/* && tsc",
     "test": "cross-env NODE_ENV=test jest --coverage --detectOpenHandles --forceExit"
   },
@@ -51,6 +51,7 @@
     "googleapis": "^109.0.0",
     "got": "^11.8.3",
     "http-proxy-agent": "^5.0.0",
+    "https-proxy-agent": "^5.0.1",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
