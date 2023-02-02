@@ -42,8 +42,9 @@ async function login_google(ctx: Context, config: any) {
 async function login_qq() {
 
 }
-async function login_weibo() {
-
+async function login_weibo(ctx: Context, config: any) {
+  ctx.status = 301;
+  ctx.redirect(`https://api.weibo.com/oauth2/authorize?client_id=${config.app_key}&response_type=code&redirect_uri=${config.redirect_uri}`)
 }
 async function login_weixin() {
 
@@ -216,20 +217,27 @@ async function callback_weibo(ctx: Context, config: any) {
   const { MAccount, MUser } = ctx.models;
   const code = ctx.request.query.code;
   const sns_type = 'weibo';
-  const result: any = await got.get(`https://api.weibo.com/oauth2/access_token?client_id=${config.client_id}&client_secret=${config.client_secret}&grant_type=authorization_code&redirect_uri=${ctx.query.redirect_uri}&code=${code}?client_id=${config.client_id}&client_secret=${config.client_secret}&code=${code}`, {
+  const result: any = await got.post(`https://api.weibo.com/oauth2/access_token?client_id=${config.app_key}&client_secret=${config.app_secret}&code=${code}&grant_type=authorization_code&redirect_uri=${config.redirect_uri}`, {
     headers: {
       accept: 'application/json',
     },
+    body: JSON.stringify({
+      client_id: config.app_key,
+      client_key: config.app_secret,
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: config.redirect_uri
+    }),
     timeout: 60000
   }).json();
-  const getUID: { uid: string } = await got.get(`https://api.weibo.com/2/account/get_uid.json`, { headers: { access_token: result.access_token } }).json();
+  const getUID: { uid: string } = await got.get(`https://api.weibo.com/2/account/get_uid.json?access_token=${result.access_token}`).json();
   const account = await MAccount.getInfo({ where: { sns_type, sns_id: getUID.uid }, lean: true });
   if (account && account.user_id) {
     const user = await MUser.getInfo({ where: { _id: account.user_id }, lean: true });
     const token = await createToken(user, ctx.config);
     ctx.redirect(`/?access_token=${token.access_token.split(' ')[1]}&refresh_token=${token.refresh_token}&redirect=${encodeURI('/')}`);
   } else {
-    const info: { id: number, name: string, profile_image_url: string } = await got.get(`https://api.weibo.com/2/users/show.json?uid=${getUID.uid}`, { headers: { access_token: result.access_token } }).json();
+    const info: { id: number, name: string, profile_image_url: string } = await got.get(`https://api.weibo.com/2/users/show.json?uid=${getUID.uid}&access_token=${result.access_token}`).json();
     await MAccount.updateOne({ sns_id: getUID.uid, sns_type }, {
       $setOnInsert: {
         _id: v4(),

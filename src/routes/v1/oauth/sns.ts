@@ -29,7 +29,7 @@ router.get('/:type/callback', async (ctx: Context) => {
   const callback_type = `callback_${ctx.params.type}`;
   const { MConfig } = ctx.models;
   const sns_config = await MConfig.getInfo({
-    where: { type: 'sns_type', name: ctx.params.type },
+    where: { type: 'sns_type', name: "sns_" + ctx.params.type },
     lean: true,
   });
   if (!sns_config) {
@@ -38,10 +38,10 @@ router.get('/:type/callback', async (ctx: Context) => {
   if (snsService[callback_type]) {
     try {
       await snsService[callback_type](ctx, sns_config.value);
-    } catch(e) {
+    } catch (e) {
       console.log(e);
       ctx.fail();
-    }    
+    }
   } else {
     ctx.fail('不支持的第三方登录类型')
   }
